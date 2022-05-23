@@ -6,7 +6,7 @@
 #include <SparkFun_SHTC3.h>
 #include <DHT.h>        
  
-/* 连接您的WIFI SSID和密码 */
+/* wifi and passward */
 #define WIFI_SSID         "MI10" //
 #define WIFI_PASSWD       "123456789"//
  
@@ -16,7 +16,7 @@
 #define DEVICE_SECRET     "2d3a383664b4896e70a7212d44820907"//
 #define REGION_ID         "cn-shanghai"
  
-/* 线上环境域名和端口号 */
+/* port index*/
 #define MQTT_SERVER       PRODUCT_KEY ".iot-as-mqtt." REGION_ID ".aliyuncs.com"
 #define MQTT_PORT         1883
 #define MQTT_USRNAME      DEVICE_NAME "&" PRODUCT_KEY
@@ -50,7 +50,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 void wifiInit()                  
 {
     WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWD);   //连接WiFi
+    WiFi.begin(WIFI_SSID, WIFI_PASSWD);   //connect WiFi
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(1000);
@@ -60,7 +60,7 @@ void wifiInit()
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());  
     Serial.print("espClient [");
-    client.setServer(MQTT_SERVER, MQTT_PORT);   /* 连接WiFi之后，连接MQTT服务器 */
+    client.setServer(MQTT_SERVER, MQTT_PORT);   /* connected WiFi，link MQTT */
     client.setCallback(callback);
 }
  
@@ -122,7 +122,7 @@ void errorDecoder(SHTC3_Status_TypeDef message) // The errorDecoder function pri
     default : Serial.print("Unknown return code"); break;
   }
 }
-//https://blog.zeruns.tech
+
 void setup() 
 {
     /* initialize serial for debugging */
@@ -130,7 +130,7 @@ void setup()
     dht.begin();   
     Serial.println("Demo Start");
     wifiInit();
-    //Wire.begin(D5,D6);           //初始化（IIC）库
+    //Wire.begin(D5,D6);           //init i2c
     unsigned char i=0;
    // errorDecoder(mySHTC3.begin());
 }
@@ -139,7 +139,7 @@ void setup()
 // the loop function runs over and over again forever
 void loop()
 {
-  delay(1000);                  //延时1000毫秒
+  delay(1000);                  //delay 1000ms
 
     float RH = dht.readHumidity();   
     float T = dht.readTemperature();
@@ -159,7 +159,7 @@ void loop()
     lastMs = millis();
     mqttCheckConnect(); 
  
-    /* 上报 */
+    /* commit */
     mqttIntervalPost();
     count=0;
     RH_sum=0;
