@@ -260,20 +260,7 @@ void cls(int m,int n)         //清除一个单元格图像
 
 
   };
-void digital()                    //绘制数字 100
-{
-     myScreen.circle(0,0,2,redColour);    //0  2   5          
-   myScreen.line(2,0,5,0,redColour);      //2  
-   myScreen.line(0,2,0,4,redColour);      //4  4   4          
-   myScreen.line(0,4,2,4,redColour);      //                        
-   myScreen.line(2,4,2,10,redColour);     //            
-   myScreen.line(2,10,5,10,redColour);    //  
-   myScreen.line(5,10,5,0,redColour);     //  10  10          
-   myScreen.circle(12,5,5,redColour);
-    myScreen.circle(12,5,3,redColour);
-   myScreen.circle(24,5,5,redColour);
-    myScreen.circle(24,5,3,redColour);
-  };
+
  void clear()               //清除整个游戏地图
  {
   for(int i=0;i<8;i++)
