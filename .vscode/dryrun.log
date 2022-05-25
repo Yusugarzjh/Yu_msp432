@@ -1,4 +1,3 @@
-make.exe --dry-run --always-make --keep-going --print-directory
 MAKE Version 5.41  Copyright (c) 1987, 2014 Embarcadero Technologies, Inc.
 Incorrect command line argument: --dry-run
 
