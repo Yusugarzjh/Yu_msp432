@@ -30,54 +30,44 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-// uart_driver.c
+//
+//****************************************************************************
+#ifndef _I2C_DRIVER_H_
+#define _I2C_DRIVER_H_
 
 //****************************************************************************
+//
+// Types
+//
+//****************************************************************************
+typedef enum {
+	eUSCI_IDLE = 0,
+	eUSCI_SUCCESS = 0,
+	eUSCI_BUSY = 1,
+	eUSCI_NACK = 2,
+	eUSCI_STOP,
+	eUSCI_START
+} eUSCI_status;
 
-#ifndef UART_DRIVER_H_
-#define UART_DRIVER_H_
+//*****************************************************************************
+//
+// Definitions
+//
+//*****************************************************************************
 
-// Choose baudrate
-#define BAUDRATE                (115200)
+//*****************************************************************************
+//
+// Exported variables
+//
+//*****************************************************************************
 
-// Global variables
-#define MAX_STR_LENGTH 271
-
-#define FALSE 0
-#define TRUE  1
-
-typedef struct{
-	unsigned char newStringReceived;
-	char          txString[MAX_STR_LENGTH];
-	char          rxString[MAX_STR_LENGTH];
-}s_test;
-
-extern s_test test;
-//extern char rxString[MAX_STR_LENGTH];     // The entire input string from the last 'return'
-//extern char txString[MAX_STR_LENGTH];
-//extern char partOfString[MAX_STR_LENGTH];
-//extern unsigned char newStringReceived;
-
-// Use handshake to secure UART communication
-//#define USE_HANDSHAKE
-#ifdef USE_HANDSHAKE
-    #define RTS_INIT	            {P2DIR |= BIT3;}
-    #define RTS_SET   	            {P2OUT |= BIT3;}
-    #define RTS_CLEAR               {P2OUT &= ~BIT3;}
-    #define CTS_INIT                {P2DIR &= ~BIT4;}
-    #define CTS_IS_SET              ((P2IN & BIT4)==BIT4)
-#else
-    #define RTS_INIT	            { }
-    #define RTS_SET   	            { }
-    #define RTS_CLEAR               { }
-    #define CTS_INIT                { }
-    #define CTS_IS_SET              (1)
-#endif
-
-void uartReceive(char data);
-void uartInit(void);
-void uartSend(char * buf, unsigned char len);
-void sendText(void);
-bool receiveText(char* data, int maxNumChars);
-
-#endif /* UART_DRIVER_H_ */
+//*****************************************************************************
+//
+// Exported prototypes
+//
+//*****************************************************************************
+extern void initI2C(void);
+extern bool writeI2C(uint8_t ui8Addr, uint8_t ui8Reg, uint8_t *Data, uint8_t ui8ByteCount);
+extern bool readI2C(uint8_t ui8Addr, uint8_t ui8Reg, uint8_t *Data, uint8_t ui8ByteCount);
+extern bool readBurstI2C(uint8_t ui8Addr, uint8_t ui8Reg, uint8_t *Data, uint32_t ui32ByteCount);
+#endif /* _I2C_DRIVER_H_ */

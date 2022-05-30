@@ -54,6 +54,10 @@ char PASSD[11]="123456789";
 char CLDSTA[22]="13357965877591237946";
 char CLDPASSD[10]="12345678";
 int CNT=1;
+static volatile uint16_t curADCResultX,curADCResultY;
+static volatile float normalizedADCRes;
+
+char str;
 #define SMCLK_FREQUENCY_HZ			(12000000)
 
 s_test test = {
@@ -78,7 +82,7 @@ void delay(int interval)
 {
     int i,j;
     for(i=0;i<interval;i++)
-        for(j=0;j<1000000;j++);
+        for(j=0;j<1025;j++);
 }
 void uartInit()
 {
@@ -170,11 +174,11 @@ void ESPInit()
 
 //    snprintf(test.txString, 60,"AT+CWMODE=1\r\n");sendTextEsp();sendTextPc();
     snprintf(test.txString, 60,"AT+CWJAP=\"%s\",\"%s\"\r\n",SSID,PASSD);sendTextEsp();sendTextPc();
-    delay(5);
+    delay(6000);
 //    snprintf(test.txString, 60,"AT+CWDHCP_DEF=1,1\r\n");sendTextEsp();sendTextPc();
 //    delay(3);
     snprintf(test.txString, 60,"AT+ATKCLDSTA=\"%s\",\"%s\"\r\n",CLDSTA,CLDPASSD);sendTextEsp();sendTextPc();
-    delay(3);
+    delay(4000);
 }
 //void EUSCIA2_IRQHandler(void)
 //{
@@ -201,18 +205,107 @@ void ESPInit()
 //
 //}
 
-void SysTick_Handler(void)
+void adcInit(void)
 {
-//    MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN0);
-    if(CNT%2==0)
-    {
-//        MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN2);
-    }
-    if(CNT%3==0)
-    {
-//        MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN1);
-    }
+    /*
+     * VRX-->5.5
+     * VRY-->5.4
+     * SW -->6.4*/
+    MAP_REF_A_setReferenceVoltage(REF_A_VREF2_5V);
+    MAP_REF_A_enableReferenceVoltage();
+    MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
+    MAP_FlashCtl_setWaitState(FLASH_BANK0, 1);
+    MAP_FlashCtl_setWaitState(FLASH_BANK1, 1);
+    MAP_PCM_setPowerState(PCM_AM_LDO_VCORE1);
+    MAP_FPU_enableModule();
+        MAP_FPU_enableLazyStacking();
+        MAP_ADC14_enableModule();
+        MAP_ADC14_initModule(ADC_CLOCKSOURCE_MCLK, ADC_PREDIVIDER_1, ADC_DIVIDER_1,
+                0);
+        MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN5,
+        GPIO_TERTIARY_MODULE_FUNCTION);
+        MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P5, GPIO_PIN4,
+        GPIO_TERTIARY_MODULE_FUNCTION);
+        /* Configuring ADC Memory */
+        MAP_ADC14_configureMultiSequenceMode(ADC_MEM0, ADC_MEM1, false);
+         MAP_ADC14_configureConversionMemory(ADC_MEM0, ADC_VREFPOS_INTBUF_VREFNEG_VSS,
+         ADC_INPUT_A0, false);
+         MAP_ADC14_configureConversionMemory(ADC_MEM1, ADC_VREFPOS_INTBUF_VREFNEG_VSS,
+         ADC_INPUT_A1, false);
+        MAP_GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P6, GPIO_PIN4);
+        MAP_GPIO_clearInterruptFlag(GPIO_PORT_P6, GPIO_PIN4);
+        MAP_GPIO_enableInterrupt(GPIO_PORT_P6, GPIO_PIN4);
+        MAP_Interrupt_enableInterrupt(INT_PORT6);
+        MAP_SysCtl_enableSRAMBankRetention(SYSCTL_SRAM_BANK1);
+        /* Enabling interrupts */
+//        MAP_ADC14_enableInterrupt(ADC_INT1);
+//        MAP_Interrupt_enableInterrupt(INT_ADC14);
+        MAP_Interrupt_enableSleepOnIsrExit();
+        MAP_Interrupt_enableMaster();
+        MAP_ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
 
-    CNT++;
+        /* Triggering the start of the sample */
+        MAP_ADC14_enableConversion();
+        MAP_ADC14_toggleConversionTrigger();
 }
+void ADC14_IRQHandler(void)
+{
+    uint64_t status = MAP_ADC14_getEnabledInterruptStatus();
+    MAP_ADC14_clearInterruptFlag(status);
+
+    if (ADC_INT1 & status)
+    {
+        curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
+        curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
+       /* curADCResult = MAP_ADC14_getResult(ADC_MEM0);
+        adc=curADCResult;
+        MAP_UART_transmitData(EUSCI_A0_BASE, 48+adc/10000);
+
+                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/1000)%10);
+                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/100)%10);
+                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/10)%10);
+                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc%10));
+                        MAP_UART_transmitData(EUSCI_A0_BASE, ' ');
+                curADCResult = MAP_ADC14_getResult(ADC_MEM1);
+                adc=curADCResult;
+                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+adc/10000);
+                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/1000)%10);
+                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/100)%10);
+                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/10)%10);
+                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc%10));
+
+                MAP_UART_transmitData(EUSCI_A0_BASE, '\r');
+                MAP_UART_transmitData(EUSCI_A0_BASE, '\n');*/
+        MAP_ADC14_toggleConversionTrigger();
+    }
+//    delay(1000);
+}
+//void PORT6_IRQHandler(void)
+//{
+//    uint32_t status;
+//
+//    status = MAP_GPIO_getEnabledInterruptStatus(GPIO_PORT_P6);
+//    MAP_GPIO_clearInterruptFlag(GPIO_PORT_P6, status);
+//    if(status & GPIO_PIN4)
+//    {
+//        MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
+//        UART_transmitData(EUSCI_A0_BASE, 'j');
+//    }
+//    delay(500);
+//}
+
+//void SysTick_Handler(void)
+//{
+////    MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN0);
+//    if(CNT%2==0)
+//    {
+////        MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN2);
+//    }
+//    if(CNT%3==0)
+//    {
+////        MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P2, GPIO_PIN1);
+//    }
+//
+//    CNT++;
+//}
 
