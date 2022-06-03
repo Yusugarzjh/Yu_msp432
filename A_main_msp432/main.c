@@ -21,15 +21,17 @@ void all_init(void);
 void GameMenu();
 void bmi_init(void);
 //void Guidance();
-
+void ChooseMenu_master();
+void ChooseMenu_gaming_win();
+void ChooseMenu_gaming_lose();
+void LoadHistory();
+void LevelSelection();
+int NewGame=1,LoadGame=0;
 int main(void)
 {
     all_init();
-
-//    Guidance();
     GameMenu();
-    LCD_CLS();
-    LCD_P6X8Str(6, 4, "GAME OVER", RED, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+
      while(1){
 //         Progress_Bar();
 //         returnValue = bmi160_bmm150_mag_compensate_xyz(&s_magcompXYZ);//¿´Íá²»Íá
@@ -62,43 +64,172 @@ void all_init(void)
 void GameMenu()
 {
     LCD_CLS();
-    int NewGame=1,LoadGame=0;
+
 
     delay(200);
     show_pic(4,1,132,64,gImage_lqTFT02);
     delay(200);
+    ChooseMenu_master();
 
-//    play();
-    LCD_P6X8Str(7, 3, "NEW GAME", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
-     LCD_P6X8Str(7, 5, "LOAD GAME", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+}
+void LevelSelection()
+{
+    switch(GameRecord)
+    {
+    case 0: play();break;
+    case 1: play1();break;
+    }
+        LCD_CLS();
+        if( GameState==0)
+        {
+            LCD_P6X8Str(6, 4, "GAME OVER", RED, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+            ChooseMenu_gaming_lose();
+        }
+        else
+        {
+            LCD_P6X8Str(8, 4, "VICTORY", YELLOW, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+            GameRecord++;
+            ChooseMenu_gaming_win();
+        }
+}
+void ChooseMenu_master()
+{
+    //   chose menu
+       NewGame=1;
+       LoadGame=0;
+        LCD_P6X8Str(7, 3, "NEW GAME->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+         LCD_P6X8Str(7, 5, "LOAD GAME->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+        while(1)
+        {
+            MAP_ADC14_toggleConversionTrigger();
+            curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
+            curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
+            if(curADCResultY<1000)
+            {
+                LCD_P6X8Str(7, 3, "NEW GAME->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                LCD_P6X8Str(7, 5, "LOAD GAME->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                NewGame=1;
+                LoadGame=0;
+            }
+            else if(curADCResultY>15000)
+            {
+                LCD_P6X8Str(7, 3, "NEW GAME->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                LCD_P6X8Str(7, 5, "LOAD GAME->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                NewGame=0;
+                LoadGame=1;
+            }
+            if(curADCResultX>15000&&NewGame==1)
+                {
+                LevelSelection();
+                }
+            else if(curADCResultX>15000&&LoadGame==1)
+                {
+                LevelSelection();
+//                LoadHistory();
+                break;
+                }
+
+        }
+}
+void ChooseMenu_gaming_lose()
+{
+    LCD_CLS();
+    //   chose menu
+       NewGame=1;
+       LoadGame=0;
+        LCD_P6X8Str(5, 3, "GAME AGAIN->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+         LCD_P6X8Str(5, 5, "RETURN MENU->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+        while(1)
+        {
+            MAP_ADC14_toggleConversionTrigger();
+            curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
+            curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
+            if(curADCResultY<1000)
+            {
+                LCD_P6X8Str(5, 3, "GAME AGAIN->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                 LCD_P6X8Str(5, 5, "RETURN MENU->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                NewGame=1;
+                LoadGame=0;
+            }
+            else if(curADCResultY>15000)
+            {
+                LCD_P6X8Str(5, 3, "GAME AGAIN->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                 LCD_P6X8Str(5, 5, "RETURN MENU->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                NewGame=0;
+                LoadGame=1;
+            }
+            if(curADCResultX>15000&&NewGame==1)
+                {
+                LevelSelection();
+                }
+            else if(curADCResultX>15000&&LoadGame==1)
+                {
+
+                GameMenu();
+                break;
+                }
+
+        }
+}
+void ChooseMenu_gaming_win()
+{
+    LCD_CLS();
+    //   chose menu
+       NewGame=1;
+       LoadGame=0;
+        LCD_P6X8Str(5, 3, "Continue GAME->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+         LCD_P6X8Str(5, 5, "RETURN MENU->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+        while(1)
+        {
+            MAP_ADC14_toggleConversionTrigger();
+            curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
+            curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
+            if(curADCResultY<1000)
+            {
+                LCD_P6X8Str(5, 3, "Continue GAME->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                 LCD_P6X8Str(5, 5, "RETURN MENU->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                NewGame=1;
+                LoadGame=0;
+            }
+            else if(curADCResultY>15000)
+            {
+                LCD_P6X8Str(5, 3, "Continue GAME->", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                 LCD_P6X8Str(5, 5, "RETURN MENU->", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+                NewGame=0;
+                LoadGame=1;
+            }
+            if(curADCResultX>15000&&NewGame==1)
+                {
+                LevelSelection();
+
+                }
+            else if(curADCResultX>15000&&LoadGame==1)
+                {
+
+                GameMenu();
+                break;
+                }
+
+        }
+}
+void LoadHistory()
+{
+    LCD_CLS();
+    LCD_P6X8Str(1, 2, "This module is not ", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+    LCD_P6X8Str(1, 3, "yet complete", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
+    LCD_P6X8Str(1, 4, "<-please exit", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
     while(1)
     {
-        MAP_ADC14_toggleConversionTrigger();//¿ØÖÆÐ¡ÈËÒÆ¶¯ËÙ¶È
+        MAP_ADC14_toggleConversionTrigger();
         curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
         curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
-        if(curADCResultY<1000)
+        if(curADCResultX<1000)
         {
-            LCD_P6X8Str(7, 3, "NEW GAME", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
-            LCD_P6X8Str(7, 5, "LOAD GAME", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
-            NewGame=1;
-            LoadGame=0;
+            GameMenu();
+              break;
         }
-        else if(curADCResultY>15000)
-        {
-            LCD_P6X8Str(7, 3, "NEW GAME", WHITE, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
-            LCD_P6X8Str(7, 5, "LOAD GAME", CYAN, BLACK);//ÏÔÊ¾Ó¢ÎÄ6*8×Ö·û´®
-            NewGame=0;
-            LoadGame=1;
-        }
-        if(curADCResultX>15000&&NewGame==1)
-            {
-
-            play();
-            break;
-            }
     }
 }
-
 void bmi_init(void)
 {
     bmi160_initialize_sensor();
