@@ -110,13 +110,12 @@ void uartInit()
 //    MAP_Interrupt_enableInterrupt(INT_EUSCIA0);
 //    MAP_Interrupt_enableSleepOnIsrExit();
 //    MAP_Interrupt_enableMaster();
+    /* Enabling Systick interrupts */
 //    MAP_SysTick_enableModule();
-//    MAP_SysTick_setPeriod(3000000);
+//    MAP_SysTick_setPeriod(12000000);//it is large ,it is slow
 //
-//    MAP_Interrupt_enableSleepOnIsrExit();
+////    MAP_Interrupt_enableSleepOnIsrExit();
 //    MAP_SysTick_enableInterrupt();
-
-    /* Enabling MASTER interrupts */
 //    MAP_Interrupt_enableMaster();
 }
 
@@ -133,8 +132,7 @@ void sendTextEsp(){
 		   if (test.txString[i] != 0)
 		  {
 		       UART_transmitData(EUSCI_A2_BASE, test.txString[i]);
-//		       UART_transmitData(EUSCI_A0_BASE, test.txString[i]);
-//			  EUSCI_A_UART_transmitData(EUSCI_A2_BASE, test.txString[i]);
+
 		  }
 		  else{
 			  break;
@@ -147,14 +145,14 @@ void sendTextPc(){
     for (i = 0; i < MAX_STR_LENGTH; ++i)
     {
        // wait until UART ready
-       while (!(UCA2IFG & UCTXIFG)) {
+       while (!(UCA0IFG & UCTXIFG)) {
            ;// USCI_A2 TX buffer ready?
        }
            if (test.txString[i] != 0)
           {
-//               UART_transmitData(EUSCI_A2_BASE, test.txString[i]);
+
                UART_transmitData(EUSCI_A0_BASE, test.txString[i]);
-//            EUSCI_A_UART_transmitData(EUSCI_A2_BASE, test.txString[i]);
+
           }
           else{
               break;
@@ -233,53 +231,58 @@ void adcInit(void)
          MAP_ADC14_configureConversionMemory(ADC_MEM1, ADC_VREFPOS_INTBUF_VREFNEG_VSS,
          ADC_INPUT_A1, false);
         MAP_GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P6, GPIO_PIN4);
-        MAP_GPIO_clearInterruptFlag(GPIO_PORT_P6, GPIO_PIN4);
-        MAP_GPIO_enableInterrupt(GPIO_PORT_P6, GPIO_PIN4);
-        MAP_Interrupt_enableInterrupt(INT_PORT6);
+//        MAP_GPIO_clearInterruptFlag(GPIO_PORT_P6, GPIO_PIN4);
+//        MAP_GPIO_enableInterrupt(GPIO_PORT_P6, GPIO_PIN4);
+//        MAP_Interrupt_enableInterrupt(INT_PORT6);
         MAP_SysCtl_enableSRAMBankRetention(SYSCTL_SRAM_BANK1);
         /* Enabling interrupts */
 //        MAP_ADC14_enableInterrupt(ADC_INT1);
 //        MAP_Interrupt_enableInterrupt(INT_ADC14);
-        MAP_Interrupt_enableSleepOnIsrExit();
-        MAP_Interrupt_enableMaster();
+//        MAP_Interrupt_enableSleepOnIsrExit();
+//        MAP_Interrupt_enableMaster();
         MAP_ADC14_enableSampleTimer(ADC_AUTOMATIC_ITERATION);
 
         /* Triggering the start of the sample */
         MAP_ADC14_enableConversion();
         MAP_ADC14_toggleConversionTrigger();
 }
-void ADC14_IRQHandler(void)
-{
-    uint64_t status = MAP_ADC14_getEnabledInterruptStatus();
-    MAP_ADC14_clearInterruptFlag(status);
-
-    if (ADC_INT1 & status)
-    {
-        curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
-        curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
-       /* curADCResult = MAP_ADC14_getResult(ADC_MEM0);
-        adc=curADCResult;
-        MAP_UART_transmitData(EUSCI_A0_BASE, 48+adc/10000);
-
-                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/1000)%10);
-                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/100)%10);
-                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/10)%10);
-                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc%10));
-                        MAP_UART_transmitData(EUSCI_A0_BASE, ' ');
-                curADCResult = MAP_ADC14_getResult(ADC_MEM1);
-                adc=curADCResult;
-                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+adc/10000);
-                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/1000)%10);
-                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/100)%10);
-                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/10)%10);
-                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc%10));
-
-                MAP_UART_transmitData(EUSCI_A0_BASE, '\r');
-                MAP_UART_transmitData(EUSCI_A0_BASE, '\n');*/
-        MAP_ADC14_toggleConversionTrigger();
-    }
-//    delay(1000);
-}
+//void ADC14_IRQHandler(void)
+//{
+//    uint64_t status = MAP_ADC14_getEnabledInterruptStatus();
+//    MAP_ADC14_clearInterruptFlag(status);
+//
+//    if (ADC_INT1 & status)
+//    {
+//        curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
+//        curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
+//
+//        adc=curADCResultX;
+//        if(adc<1000||adc>15000)
+//        {
+//        MAP_UART_transmitData(EUSCI_A0_BASE, 48+adc/10000);
+//
+//                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/1000)%10);
+//                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/100)%10);
+//                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/10)%10);
+//                MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc%10));
+//                        MAP_UART_transmitData(EUSCI_A0_BASE, ' ');
+//        }
+//        if(adc<1000||adc>15000)
+//        {
+//                adc=curADCResultY;
+//                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+adc/10000);
+//                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/1000)%10);
+//                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/100)%10);
+//                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc/10)%10);
+//                        MAP_UART_transmitData(EUSCI_A0_BASE, 48+(adc%10));
+//
+//                MAP_UART_transmitData(EUSCI_A0_BASE, '\r');
+//                MAP_UART_transmitData(EUSCI_A0_BASE, '\n');
+//        }
+//        MAP_ADC14_toggleConversionTrigger();
+//    }
+////    delay(1000);
+//}
 //void PORT6_IRQHandler(void)
 //{
 //    uint32_t status;
@@ -308,4 +311,3 @@ void ADC14_IRQHandler(void)
 //
 //    CNT++;
 //}
-

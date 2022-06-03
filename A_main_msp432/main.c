@@ -8,6 +8,9 @@
 #include "demo_sysctl.h"
 #include "bmi160_support.h"
 #include "uart_driver.h"
+extern unsigned char lqTFT12864[] ;
+extern unsigned char gImage_lqTFT02[] ;
+extern unsigned char lqTFT01[] ;
 BMI160_RETURN_FUNCTION_TYPE returnValue;
 struct bmi160_gyro_t        s_gyroXYZ;
 struct bmi160_accel_t       s_accelXYZ;
@@ -15,52 +18,87 @@ struct bmi160_mag_xyz_s32_t s_magcompXYZ;
 s32 returnRslt;
 void display_test(void);
 void all_init(void);
-
+void GameMenu();
 void bmi_init(void);
-
+//void Guidance();
 
 int main(void)
 {
     all_init();
-//    paint();
+
+//    Guidance();
+    GameMenu();
     LCD_CLS();
-    snprintf(test.txString, 60,"gyro");
-    sendTextPc();
-    sendTextEsp();
-    LCD_P6X8Str(2,0,test.txString,CYAN,BLACK);
-    snprintf(test.txString, 60,"accel");
-    sendTextPc();
-    sendTextEsp();
-    LCD_P6X8Str(2,2,test.txString,CYAN,BLACK);
-        snprintf(test.txString, 60,"magcomp");
-        sendTextPc();
-        sendTextEsp();
-        LCD_P6X8Str(2,4,test.txString,CYAN,BLACK);
+    LCD_P6X8Str(6, 4, "GAME OVER", RED, BLACK);//显示英文6*8字符串
      while(1){
-         returnValue = bmi160_bmm150_mag_compensate_xyz(&s_magcompXYZ);//看歪不歪
-         returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//陀螺仪
-         returnValue = bmi160_read_gyro_xyz(&s_gyroXYZ);//看歪不歪
-//             play();                //
+//         Progress_Bar();
+//         returnValue = bmi160_bmm150_mag_compensate_xyz(&s_magcompXYZ);//看歪不歪
+//         returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//陀螺仪
+//         returnValue = bmi160_read_gyro_xyz(&s_gyroXYZ);//看歪不歪
+                       //延时
+//display_pic();                              //显示图片picture.h
+//time_delay_ms(300);
+//         UART_transmitData(EUSCI_A0_BASE, 48);
+//            Stick();
 //         MAP_PCM_gotoLPM0();
+//         display_test();
 
-         display_test();
-              //delay(1);
              }
-
-
 }
+
 
 
 void all_init(void)
 {
     uartInit();//
-    ESPInit();
-    LCD_init();
+//    ESPInit();
     initI2C();
-//    adcInit();
-    //bmi160初始化
     bmi_init();
+    LCD_init();
+//    LCD_draw_line(3,3,33,33,RED);
+    adcInit();
+    //bmi160初始化
 }
+void GameMenu()
+{
+    LCD_CLS();
+    int NewGame=1,LoadGame=0;
+
+    delay(200);
+    show_pic(4,1,132,64,gImage_lqTFT02);
+    delay(200);
+
+//    play();
+    LCD_P6X8Str(7, 3, "NEW GAME", CYAN, BLACK);//显示英文6*8字符串
+     LCD_P6X8Str(7, 5, "LOAD GAME", WHITE, BLACK);//显示英文6*8字符串
+    while(1)
+    {
+        MAP_ADC14_toggleConversionTrigger();//控制小人移动速度
+        curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
+        curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
+        if(curADCResultY<1000)
+        {
+            LCD_P6X8Str(7, 3, "NEW GAME", CYAN, BLACK);//显示英文6*8字符串
+            LCD_P6X8Str(7, 5, "LOAD GAME", WHITE, BLACK);//显示英文6*8字符串
+            NewGame=1;
+            LoadGame=0;
+        }
+        else if(curADCResultY>15000)
+        {
+            LCD_P6X8Str(7, 3, "NEW GAME", WHITE, BLACK);//显示英文6*8字符串
+            LCD_P6X8Str(7, 5, "LOAD GAME", CYAN, BLACK);//显示英文6*8字符串
+            NewGame=0;
+            LoadGame=1;
+        }
+        if(curADCResultX>15000&&NewGame==1)
+            {
+
+            play();
+            break;
+            }
+    }
+}
+
 void bmi_init(void)
 {
     bmi160_initialize_sensor();
@@ -71,41 +109,7 @@ void bmi_init(void)
 
 void display_test(void)
 {
-                      //OLED清屏
-    //    LCD_P16X16Str(1,0,"龙邱智能科技",RED,BLACK);       //显示汉字字符串
-    //    LCD_P6X8Str(2,7,"LongQiu.taobao.com",CYAN,BLACK);   //显示英文6*8字符串
-    //    LCD_P8X16Str(2,2,"www.LQIST.cn",BLUE,BLACK);         //显示英文8*16字符串
-    //    LCD_P16X16Str(1,1,"液晶校准测试",YELLOW,BLACK);     //显示汉字字符串
-    //      snprintf(test.txString, 60,"游戏开始");
-    //      LCD_P8X16Str(1,2,test.txString,BLUE,BLACK);
-    //      LCD_P8X16Str(2,2,"www.LQIST.cn",BLUE,BLACK);
-//    snprintf(test.txString, 60,"magcomp");
-//    sendTextPc();
-//    sendTextEsp();
-//    LCD_P6X8Str(0,2,test.txString,CYAN,BLACK);
-    snprintf(test.txString, 60,"x:\%d,y:\%d,z:\%d          ",s_magcompXYZ.x, s_magcompXYZ.y, s_magcompXYZ.z);
-    sendTextPc();
-    sendTextEsp();
-    LCD_P6X8Str(2,5,test.txString,CYAN,BLACK);
-    snprintf(test.txString, 60,"x:\%d,y:\%d,z:\%d          ",s_gyroXYZ.x, s_gyroXYZ.y, s_gyroXYZ.z);
-    sendTextPc();
-    sendTextEsp();
-    LCD_P6X8Str(2,1,test.txString,CYAN,BLACK);
-    snprintf(test.txString, 60,"x:\%d,y:\%d,z:\%d         ",s_accelXYZ.x, s_accelXYZ.y, s_accelXYZ.z);
-    sendTextPc();
-    sendTextEsp();
-    LCD_P6X8Str(2,3,test.txString,CYAN,BLACK);
-    //          sendTextEsp();
-    //          snprintf(test.txString, 60,"游戏开始\r\n",s_magcompXYZ.x, s_magcompXYZ.y, s_magcompXYZ.z);
-    //          sendTextEsp();
-    //          snprintf(test.txString, 60,"{\"gyro\":{\"x\":%d,\"y\":%d,\"z\":%d}\r\n",s_gyroXYZ.x, s_gyroXYZ.y, s_gyroXYZ.z);
-    //          sendTextpc();
-    //          snprintf(test.txString, 60,"{\"accel\":{\"x\":%d,\"y\":%d,\"z\":%d}}\r\n",s_accelXYZ.x, s_accelXYZ.y, s_accelXYZ.z);
-    //          sendTextpc();
-              //Send UART data JSON string
-    //          LCD_P6X8Str(2,7,test.txString,CYAN,BLACK);
-    //          snprintf(test.txString, 60,"{\"mag\":{\"x\":%d,\"y\":%d,\"z\":%d}}\r\n",s_magcompXYZ.x, s_magcompXYZ.y, s_magcompXYZ.z);
-    //                    sendTextpc();
+
     delay(500);
 }
 

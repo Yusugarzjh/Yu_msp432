@@ -42,11 +42,6 @@ void OLED_GPIO()
     MAP_GPIO_setAsOutputPin(LCD_RST_PORT, LCD_RST_PIN );
     MAP_GPIO_setAsOutputPin(LCD_DC_PORT, LCD_DC_PIN);
     MAP_GPIO_setAsOutputPin(LCD_CS_PORT, LCD_CS_PIN);
-//	GPIO_InitTypeDef GPIO_InitStructure;						//原来代码外接晶振配置，不用管
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_Init(GPIOD, &GPIO_InitStructure);
 	}
 
 void LCD_init(void)					//LCD显示屏初始化，

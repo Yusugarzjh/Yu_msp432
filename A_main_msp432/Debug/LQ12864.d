@@ -1,6 +1,10 @@
 # FIXED
 
 LQ12864.obj: ../LQ12864.c
+LQ12864.obj: ../picture.h
+LQ12864.obj: ../lqTFT12864.h
+LQ12864.obj: ../lqTFT02.h
+LQ12864.obj: ../lqTFT01.h
 LQ12864.obj: D:/msp423_software/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/driverlib.h
 LQ12864.obj: D:/msp423_software/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/adc14.h
 LQ12864.obj: D:/msp423_software/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include/stdint.h
@@ -55,6 +59,14 @@ LQ12864.obj: D:/msp423_software/simplelink_msp432p4_sdk_3_40_01_02/source/ti/dev
 LQ12864.obj: C:/Users/Yu-sugar/workspace_v11/A_main_msp432/LQ12864.h
 
 ../LQ12864.c:
+
+../picture.h:
+
+../lqTFT12864.h:
+
+../lqTFT02.h:
+
+../lqTFT01.h:
 
 D:/msp423_software/simplelink_msp432p4_sdk_3_40_01_02/source/ti/devices/msp432p4xx/driverlib/driverlib.h:
 

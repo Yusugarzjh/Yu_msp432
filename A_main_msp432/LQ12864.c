@@ -1,27 +1,15 @@
 //#include "stm32f10x.h"
-//#include "picture.h"
-//#include "lqTFT12864.h"
+#include "picture.h"
+#include "lqTFT12864.h"
+#include "lqTFT02.h"
+#include "lqTFT01.h"
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 
 /* Standard Includes */
 #include <stdint.h>
 #include <stdbool.h>
 #include <LQ12864.h>
-#define LCD_SCL_PORT GPIO_PORT_P4
-#define LCD_SCL_PIN  GPIO_PIN1
-#define LCD_SDA_PORT GPIO_PORT_P4
-#define LCD_SDA_PIN  GPIO_PIN2
-#define LCD_RST_PORT GPIO_PORT_P4
-#define LCD_RST_PIN  GPIO_PIN3
-#define LCD_DC_PORT  GPIO_PORT_P4
-#define LCD_DC_PIN   GPIO_PIN4
-#define LCD_CS_PORT  GPIO_PORT_P1
-#define LCD_CS_PIN   GPIO_PIN5
-#define LCD_SCL(x)  ((x)?(GPIO_setOutputHighOnPin(LCD_SCL_PORT,LCD_SCL_PIN)):(GPIO_setOutputLowOnPin(LCD_SCL_PORT,LCD_SCL_PIN)))
-#define LCD_SDA(x)  ((x)?(GPIO_setOutputHighOnPin(LCD_SDA_PORT,LCD_SDA_PIN)):(GPIO_setOutputLowOnPin(LCD_SDA_PORT,LCD_SDA_PIN)))
-#define LCD_RST(x)  ((x)?(GPIO_setOutputHighOnPin(LCD_RST_PORT,LCD_RST_PIN)):(GPIO_setOutputLowOnPin(LCD_RST_PORT,LCD_RST_PIN)))
-#define LCD_DC(x)   ((x)?(GPIO_setOutputHighOnPin(LCD_DC_PORT,LCD_DC_PIN)):(GPIO_setOutputLowOnPin(LCD_DC_PORT,LCD_DC_PIN)))
-#define LCD_CS(x)   ((x)?(GPIO_setOutputHighOnPin(LCD_CS_PORT,LCD_CS_PIN)):(GPIO_setOutputLowOnPin(LCD_CS_PORT,LCD_CS_PIN )))
+
 void time_delay_ms(unsigned int ms)
 {
   unsigned int i,j;
@@ -34,6 +22,7 @@ void time_delay_ms(unsigned int ms)
 		
   }
 }
+
 void OLED_GPIO()
 {  	
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
@@ -42,21 +31,9 @@ void OLED_GPIO()
     MAP_GPIO_setAsOutputPin(LCD_RST_PORT, LCD_RST_PIN );
     MAP_GPIO_setAsOutputPin(LCD_DC_PORT, LCD_DC_PIN);
     MAP_GPIO_setAsOutputPin(LCD_CS_PORT, LCD_CS_PIN);
-//	GPIO_InitTypeDef GPIO_InitStructure;
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_Init(GPIOD, &GPIO_InitStructure);
 	}
-/**********************************************************
-函数名称：LCD_init()
-入口参数：无
-出口参数：无
-时间：2016/11/12
-功能说明：器件初始化
-其他说明：无
-**********************************************************/
-void LCD_init(void)
+
+void LCD_init(void)					//LCD显示屏初始化，
 { 		
     OLED_GPIO();
 //   --- LQTFT_RST=0;
@@ -418,7 +395,7 @@ void LCD_draw_line(unsigned char xs,unsigned char ys,unsigned char xe,unsigned c
 		for(i=0;i<(ye-ys+1);i++)
 		{
 			LCD_write_para16(color_dat);
-                        time_delay_ms(1); //慢动作设置，时间越长，打点越慢！  
+                        // time_delay_ms(1); //慢动作设置，时间越长，打点越慢！  
 		}
 	}
 	else if(ys==ye)						//如果是水平线则只需要对水平坐标计数
@@ -427,7 +404,7 @@ void LCD_draw_line(unsigned char xs,unsigned char ys,unsigned char xe,unsigned c
  	  	for(i=0;i<(xe-xs+1);i++)
 		{
 			LCD_write_para16(color_dat);
-                        time_delay_ms(1); //慢动作设置，时间越长，打点越慢！  
+                        // time_delay_ms(1); //慢动作设置，时间越长，打点越慢！  
 		}
 	} 
 	else											//如果是斜线，则重新计算，使用画点函数画出直线
@@ -485,35 +462,35 @@ void LCD_draw_dot(unsigned char x,unsigned char y,unsigned int color_dat)
 }
 
 /****************显示图片（从单片机的DATA区）********************************/	
-//void display_pic()
-//{
-//	unsigned int i,j,k=0;
-//
-//	LCD_SetPos(2,0,XMAX-3,YMAX-1);
-//	for(i=0;i<XMAX;i++)
-//	{
-//	   	for(j=0;j<YMAX;j++)
-//		{
-//		  LCD_write_para16(((unsigned int)PIC[k])<<8|PIC[k+1]);
-//		  k+=2;
-//		}
-//	}
-// }
+void display_pic()
+{
+	unsigned int i,j,k=0;
 
-//void show_pic(unsigned char xs,unsigned char ys,unsigned char xe,unsigned char ye,unsigned char *ppic)
-//{
-//	unsigned int i,j,k=0;
-//
-//	LCD_SetPos(xs,ys,xe,ye);
-//	for(i=0;i<ye-ys;i++)
-//	{
-//	   	for(j=0;j<xe-xs;j++)
-//		{
-//		  LCD_write_para16(((unsigned int)ppic[k])<<8|ppic[k+1]);
-//		  k+=2;
-//		}
-//	}
-// }
+	LCD_SetPos(2,0,XMAX-3,YMAX-1);
+	for(i=0;i<XMAX;i++)
+	{
+	   	for(j=0;j<YMAX;j++)
+		{
+		  LCD_write_para16(((unsigned int)PIC[k])<<8|PIC[k+1]);
+		  k+=2;
+		}
+	}
+ }
+
+void show_pic(unsigned char xs,unsigned char ys,unsigned char xe,unsigned char ye,unsigned char *ppic)
+{
+	unsigned int i,j,k=0;
+
+	LCD_SetPos(xs,ys,xe,ye);
+	for(i=0;i<ye-ys;i++)
+	{
+	   	for(j=0;j<xe-xs;j++)
+		{
+		  LCD_write_para16(((unsigned int)ppic[k])<<8|ppic[k+1]);
+		  k+=2;
+		}
+	}
+ }
 
 /*--------------------------------------------------------------*/
 //	  字体:	8*6字体
@@ -727,7 +704,7 @@ unsigned char Font_code16[][16] = {
 };	
 unsigned char hanzi_Idx[] = 
 {
-	"北京龙邱丘智能科技淘宝店液晶单片机智能车温度高海拔测试校准取消按键绝对相：°"
+	"北京龙邱丘智能科技淘宝店液晶单片机智能车温度高海拔测试校准取消按键绝对相：°病胶囊人墙"
 };
 unsigned char hanzi[] = {	
 //取码规则:	高位在前, 行扫描, 阴码(1-亮, 0-灭)
@@ -854,7 +831,16 @@ unsigned char hanzi16x16[] = {
 0x00,0x00,0x38,0x00,0x38,0x00,0x00,0x00,0x38,0x00,0x38,0x00,0x00,0x00,0x00,0x00,//：36
 0x00,0x00,0x00,0x00,0x38,0x00,0x6C,0x00,0x6C,0x00,0x38,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,//°37
-  	
+0x04,0x20,0x0C,0x30,0x02,0x40,0x01,0x80,0x43,0xC2,0xC7,0xE3,0x2F,0xF4,0x1E,0x78,
+0x1E,0x78,0x2F,0xF4,0xC7,0xE3,0x43,0xC2,0x01,0x80,0x02,0x40,0x0C,0x30,0x04,0x20,//病38
+0x00,0x3E,0x00,0x47,0x00,0x83,0x01,0x01,0x02,0x01,0x04,0x01,0x0E,0x02,0x13,0x04,
+0x21,0x88,0x40,0xD0,0x80,0x60,0x80,0x40,0x80,0x80,0xC1,0x00,0xE2,0x00,0x7C,0x00,//胶39
+0x00,0x3E,0x00,0x57,0x00,0x83,0x01,0x55,0x02,0x01,0x05,0x55,0x0E,0x02,0x1F,0x54,
+0x3F,0x88,0x7F,0xD0,0xFF,0xE0,0xFF,0xC0,0xFF,0x80,0xFF,0x00,0xFE,0x00,0x7C,0x00,//囊40
+0x00,0x00,0x0F,0xC0,0x0C,0x60,0x09,0xA0,0x08,0x20,0x0C,0x28,0x07,0xEC,0x01,0x7C,
+0x01,0xC0,0x01,0xE0,0x01,0xB8,0x01,0x98,0x03,0x80,0x06,0xC0,0x0C,0x60,0x0C,0x20,//人41
+0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
+0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,//墙41
 };
 
 
@@ -1005,7 +991,7 @@ void LCD_P16X16Str(unsigned char x,unsigned char y,unsigned char *s_dat,unsigned
 	    //y+=1;//左右方向
 		x+=1;//上下方向  		  	
 	  	ii += 2;
-                time_delay_ms(201);//汉字显示速度，演示用，平时可以注释掉，不影响显示速度
+                // time_delay_ms(201);//汉字显示速度，演示用，平时可以注释掉，不影响显示速度
 	}
 }
 
@@ -1018,7 +1004,7 @@ void LCD_P6X8Str(unsigned char x, unsigned char y, unsigned char *s_dat,unsigned
 	while(*s_dat)
         {
           LCD_P6X8(x++, y, *s_dat++,word_color,back_color);
-//          time_delay_ms(201);//汉字显示速度，演示用，平时可以注释掉，不影响显示速度
+        //   time_delay_ms(201);//汉字显示速度，演示用，平时可以注释掉，不影响显示速度
         }
 }
 
