@@ -86,8 +86,16 @@ void LevelSelection()//关卡选择封装函数
     {
         LCD_P16X16Str(3,1, "恭喜你", ORANGE, SLIVER);
         LCD_P16X16Str(2,2, "成功通过", ORANGE, SLIVER);
-        GameRecord++;
-        ChooseMenu_gaming_win();
+        if(GameRecord==2&&GameState==1)
+        {
+            GameRecord=0;
+            ChooseMenu_master();
+        }
+        else
+        {
+            GameRecord++;
+            ChooseMenu_gaming_win();
+        }
     }
 }
 void ChooseMenu_master()//游戏菜单主界面

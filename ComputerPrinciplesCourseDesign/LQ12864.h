@@ -1,19 +1,8 @@
-/*LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
-¡¾Æ½    Ì¨¡¿±±¾©ÁúÇñÖÇÄÜ¿Æ¼¼MK66FX1M0VLQ18ºËÐÄ°å
-¡¾±à    Ð´¡¿CHIUSIR
-¡¾±¸    ×¢¡¿
-¡¾Èí¼þ°æ±¾¡¿V1.0
-¡¾×îºó¸üÐÂ¡¿2016Äê08ÔÂ20ÈÕ
-¡¾Ïà¹ØÐÅÏ¢²Î¿¼ÏÂÁÐµØÖ·¡¿
-¡¾Íø    Õ¾¡¿http://www.lqist.cn
-¡¾ÌÔ±¦µêÆÌ¡¿http://shop36265907.taobao.com
-¡¾½»Á÷ÓÊÏä¡¿chiusir@163.com
-QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
+
 
 #ifndef __LQ12864_H__
 #define __LQ12864_H__
-//#include "stm32f10x.h"
-/*******************½Ó¿Ú¶¨Òå******************************/
+
 					  
 #define	LQTFT_A0	PDout(3)
 #define	LQTFT_RST	PDout(2) 
@@ -27,7 +16,7 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define	BLUE	0x001f
 #define	PURPLE	0xf81f
 #define	YELLOW	0xffe0
-#define	CYAN	0x07ff 		//À¶ÂÌÉ«
+#define	CYAN	0x07ff 		
 #define	ORANGE	0xfc08
 #define	BLACK	0x6b4d//0x0000
 #define PINK    0xFDB8
@@ -37,14 +26,6 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define	XMAX	132//132
 #define	YMAX	65//64
 
-//#define LCD_SCL_PORT GPIO_PORT_P4
-//#define LCD_SCL_PIN  GPIO_PIN1
-//#define LCD_SDA_PORT GPIO_PORT_P4
-//#define LCD_SDA_PIN  GPIO_PIN2
-//#define LCD_RST_PORT GPIO_PORT_P4
-//#define LCD_RST_PIN  GPIO_PIN3
-//#define LCD_DC_PORT  GPIO_PORT_P4
-//#define LCD_DC_PIN   GPIO_PIN4
 #define LCD_SCL_PORT GPIO_PORT_P6
 #define LCD_SCL_PIN  GPIO_PIN7
 #define LCD_SDA_PORT GPIO_PORT_P1
@@ -60,33 +41,33 @@ QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ*/
 #define LCD_RST(x)  ((x)?(GPIO_setOutputHighOnPin(LCD_RST_PORT,LCD_RST_PIN)):(GPIO_setOutputLowOnPin(LCD_RST_PORT,LCD_RST_PIN)))
 #define LCD_DC(x)   ((x)?(GPIO_setOutputHighOnPin(LCD_DC_PORT,LCD_DC_PIN)):(GPIO_setOutputLowOnPin(LCD_DC_PORT,LCD_DC_PIN)))
 #define LCD_CS(x)   ((x)?(GPIO_setOutputHighOnPin(LCD_CS_PORT,LCD_CS_PIN)):(GPIO_setOutputLowOnPin(LCD_CS_PORT,LCD_CS_PIN )))
-/*****************Ë½ÓÐº¯ÊýÉùÃû*********************************/
+/*****************Ë½ï¿½Ðºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*********************************/
 void time_delay_ms(unsigned int ms)	 ;
-void LCD_init(void);									//LCD³õÊ¼»¯
+void LCD_init(void);									//LCDï¿½ï¿½Ê¼ï¿½ï¿½
 
-void LCD_write_command(unsigned char cmd);						//·¢ËÍ¿ØÖÆ×Ö
+void LCD_write_command(unsigned char cmd);						//ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ï¿½ï¿½
 
-void LCD_write_para8(unsigned char dat);						//·¢ËÍÊý¾Ý²ÎÊý
+void LCD_write_para8(unsigned char dat);						//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý²ï¿½ï¿½ï¿½
 
-void LCD_write_para16(unsigned int dat);						//·¢ËÍÏñËØÏÔÊ¾²ÎÊý
+void LCD_write_para16(unsigned int dat);						//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
 
-void LCD_address_rst(void);							    //DDRAMµØÖ·ÖØÖÃ
+void LCD_address_rst(void);							    //DDRAMï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½
 
-void LCD_SetPos(unsigned char xs,unsigned char ys,unsigned char xe,unsigned char ye);	//¶¨Î»ÏÔÊ¾ÏñËØÎ»ÖÃ
-void LCD_display_full(unsigned int color);					//È«ÆÁÏÔÊ¾Ä³ÖÖÑÕÉ«
+void LCD_SetPos(unsigned char xs,unsigned char ys,unsigned char xe,unsigned char ye);	//ï¿½ï¿½Î»ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+void LCD_display_full(unsigned int color);					//È«ï¿½ï¿½ï¿½ï¿½Ê¾Ä³ï¿½ï¿½ï¿½ï¿½É«
 void LCD_CLS(void);
 
 void LCD_draw_part(unsigned char xs,unsigned char ys,unsigned char xe,unsigned char ye,unsigned int color_dat);
-															//Ìî³ä¾ØÐÎÇøÓò£¬ÐÐÆðÊ¼¡¢ÖÕÖ¹×ø±ê£¬ÁÐÆðÊ¼¡¢ÖÕÖ¹×ø±ê£¬ÑÕÉ«
+															//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½É«
 void LCD_draw_line(unsigned char xs,unsigned char ys,unsigned char xe,unsigned char ye,unsigned int color_dat);
-															//»­Ïß£¬ÐÐÆðÊ¼¡¢ÖÕÖ¹×ø±ê£¬ÁÐÆðÊ¼¡¢ÖÕÖ¹×ø±ê£¬ÑÕÉ«
+															//ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½É«
 void LCD_draw_rectangle(unsigned char xs,unsigned char ys,unsigned char xe,unsigned char ye,unsigned int color_dat);
-															//»­¾ØÐÎ±ß¿ò£¬ÐÐÆðÊ¼¡¢ÖÕÖ¹×ø±ê£¬ÁÐÆðÊ¼¡¢ÖÕÖ¹×ø±ê£¬ÑÕÉ«
+															//ï¿½ï¿½ï¿½ï¿½ï¿½Î±ß¿ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½É«
 void LCD_draw_circle(unsigned char x,unsigned char y,unsigned char r,unsigned int color_dat);
-															//»­Ô²ÐÎ±ß¿ò£¬Ô²ÐÄºá×ø±ê¡¢×Ý×ø±ê£¬°ë¾¶£¬ÑÕÉ«
-void LCD_draw_dot(unsigned char x,unsigned char y,unsigned int color_dat);	//»­µã£¬ºá×ø±ê£¬×Ý×ø±ê£¬ÑÕÉ«
+															//ï¿½ï¿½Ô²ï¿½Î±ß¿ï¿½Ô²ï¿½Äºï¿½ï¿½ï¿½ï¿½ê¡¢ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬ï¿½ë¾¶ï¿½ï¿½ï¿½ï¿½É«
+void LCD_draw_dot(unsigned char x,unsigned char y,unsigned int color_dat);	//ï¿½ï¿½ï¿½ã£¬ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½É«
 
-void display_pic();//ÏÔÊ¾Í¼Æ¬
+void display_pic();//ï¿½ï¿½Ê¾Í¼Æ¬
 
 void LCD_P8X16(unsigned char x, unsigned char y, unsigned char c_dat,unsigned int word_color,unsigned int back_color);
 

@@ -306,10 +306,10 @@ void play2()//关卡三
     //change map
     int mymap_new[MAPX_MAX][MAPY_MAX]=
     {
-     {3,0,0,0,0,1,1},       //0 blank
-     {3,1,0,4,4,0,1},       // 1 wall
-     {3,3,4,4,0,0,1},       // 3 virus
-     {0,3,0,0,4,5,1},       //4vaccine
+     {3,0,0,0,0,1,1},       
+     {3,1,0,4,4,0,1},      
+     {3,3,4,4,0,0,1},     
+     {0,3,0,0,4,5,1},     
       };
         for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
             {for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
@@ -318,11 +318,10 @@ void play2()//关卡三
                 }
               }
     //change map
-//    LCD_CLS();
     LCD_display_full(PINK);
     paint();
     PersonX=3;
-    PersonY=5;//��ʼλ��
+    PersonY=5;
     GameState=1;
         while(mymap[0][0]!=7||mymap[1][0]!=7||mymap[2][0]!=7||mymap[2][1]!=7||mymap[3][1]!=7)
         {
