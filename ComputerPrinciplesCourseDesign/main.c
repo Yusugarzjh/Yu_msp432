@@ -1,3 +1,23 @@
+/*
+ *      修改过的文件有
+ *      LQ12864.c
+ *      LQ12864.h
+ *      uart_driver.c
+ *      my_source.h
+ *      模块接线
+        摇杆
+         VRX-->5.5
+         VRY-->5.4
+        8266
+         TX-->3.2
+         RX-->3.3
+        彩色屏
+         CK/SCL-->6.7
+         SD/SDA-->1.6
+         RET-->2.3
+         A0-->1.7
+ *      Author: Yu-sugar
+ */
 #include <stdlib.h>
 #include <ti/devices/msp432p4xx/inc/msp432.h>
 #include "stdio.h"
