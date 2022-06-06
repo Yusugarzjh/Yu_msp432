@@ -1,10 +1,9 @@
 /*
  * variable.h
  *
- *  Created on: 2022ƒÍ5‘¬23»’
+ *  Created on: 2022ÔøΩÔøΩ5ÔøΩÔøΩ23ÔøΩÔøΩ
  *      Author: Yu-sugar
  */
-
 #ifndef MY_SOURCE_H_
 #define MY_SOURCE_H_
 #include <stdlib.h>
@@ -17,11 +16,11 @@
 #include "uart_driver.h"
 #include "opt3001.h"
 BMI160_RETURN_FUNCTION_TYPE returnValue;
-// BMI160/BMM150
+// BMI160ÁªìÊûÑ‰ΩìÂèòÈáèÂÆö‰πâ
 struct bmi160_gyro_t        s_gyroXYZ;
 struct bmi160_accel_t       s_accelXYZ;
 struct bmi160_mag_xyz_s32_t s_magcompXYZ;
-//Calibration off-sets
+//‰º†ÊÑüÂô®Êï∞ÊçÆÂèòÈáè
 int8_t accel_off_x;
 int8_t accel_off_y;
 int8_t accel_off_z;
@@ -43,161 +42,129 @@ int32_t gyroAvgZ = 0.0;
 int32_t accelAvgX = 0.0;
 int32_t accelAvgY = 0.0;
 int32_t accelAvgZ = 0.0;
-bool BME_on = true;
-#define  OLED_GAME
-//#define  NORMAL_MAP
-//#define  TEST_MAP
 // OPT3001
 uint16_t rawData;
 float     convertedLux;
-#define  MAPX_MAX 4
+#define  MAPX_MAX 4 //Âú∞ÂõæÂ§ßÂ∞è4x7
 #define  MAPY_MAX 7
-bool BMI_on = true;
 int i_axle,j_axle;
-int GameRecord=0;//±£¥Êµƒ”Œœ∑º«¬º
-int mymap[MAPX_MAX][MAPY_MAX]=           //∂®“Â“ª∏ˆ8x8µƒµÿÕº£¨”√ ˝◊È±Ì æ∏˜µ•‘™∏Ò‘™Àÿ
+int GameRecord=0;//ËÆ∞ÂΩïÊ∏∏ÊàèÂÖ≥Âç°
+int mymap[MAPX_MAX][MAPY_MAX]=   //ÂàùÂßãÂåñÂú∞ÂõæÊï∞ÁªÑ0Á©∫Âú∞„ÄÅ1Â¢ô‰Ωì„ÄÅ3ÁóÖÊØí„ÄÅ4Áñ´ËãóËÉ∂Âõä„ÄÅ5ÂåªÊä§‰∫∫Âëò„ÄÅ7ÁóÖÊØíÂä†Áñ´ËãóËÉ∂Âõä„ÄÅ8‰∫∫Âä†ÁóÖÊØí
 {
-  {5,4,3,0,0,0,1},//5 person
-  {0,0,0,0,0,0,1},//7virus+vaccine
-  {0,0,0,0,0,0,1},//8person+vaccine
-  {0,0,0,0,0,0,1},
-
+  {0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0},
+  {0,0,0,0,0,0,0},
   };
 int PersonX,PersonY,stick_x=68,stick_y=32;
-int BarX=114,BarY=64,GameState=0,TimerInterval=1;//Ω¯∂»Ãıœ‡πÿ
-void Progress_Bar()
+int BarX=114,BarY=64;//ËøõÂ∫¶Êù°‰ΩçÁΩÆÂàùÂßãÂåñ
+int TimerInterval=1;//ËøõÂ∫¶Êù°ÊéßÂà∂Áõ∏ÂÖ≥ÂèòÈáè
+int GameState=0;//ËÆ∞ÂΩïÊ∏∏ÊàèÁªìÊùüÊó∂ÁöÑÁä∂ÊÄÅ
+void Progress_Bar()//Ê∏∏ÊàèËøõÂ∫¶Êù°
 {
+            //Ëé∑ÂèñÂΩìÂâçÂÖâÁÖßÂº∫Â∫¶
             sensorOpt3001Read(&rawData);
             sensorOpt3001Convert(rawData, &convertedLux);
-            int BarSpeed;
+            int BarSpeed;     //ÊéßÂà∂ËøõÂ∫¶Êù°ÈÄüÂ∫¶ÂèòÈáè
             snprintf(test.txString, 60,
                     "{\"light\":{\"lux\":%d}}\r\n",
                     abs(convertedLux));
-            sendTextPc();
-            sendTextEsp();
-            if(abs(convertedLux)<300)
+            sendTextPc(); //ÂèëÈÄÅÂÖâÁÖßÂº∫Â∫¶Ëá≥‰∏≤Âè£
+            sendTextEsp();//ÂèëÈÄÅÂÖâÁÖßÂº∫Â∫¶Ëá≥‰∫ëÁ´Ø
+            if(abs(convertedLux)<300)//ÂÖâÁÖßÂº∫Â∫¶‰ΩéÈÄüÂ∫¶ËæÉÊÖ¢
                 BarSpeed=10;
             else if(abs(convertedLux)<1000)
                 BarSpeed=5;
-            else
+            else                    //ÂÖâÁÖßÂº∫Â∫¶È´òÈÄüÂ∫¶ËæÉÂø´
                 BarSpeed=1;
             TimerInterval++;
             if(TimerInterval%BarSpeed==0)
             {
-//                UART_transmitData(EUSCI_A0_BASE, BarY--);
                 BarY-=2;
-                LCD_draw_line(BarX,BarY,BarX+16,BarY,GREEN);
+                LCD_draw_line(BarX,BarY,BarX+16,BarY,GREEN);//ÁªòÂà∂ËøõÂ∫¶Êù°
             }
 }
-void paint()             //ªÊ÷∆≥ı ºµÿÕº
+void paint()             //ÁªòÂà∂Ê∏∏ÊàèÂú∞Âõæ
 {
  for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
    { for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
        {
            switch(mymap[i_axle][j_axle])
            {
-             #ifdef   OLED_GAME
-//             case 0:LCD_P16X16Str(j_axle,i_axle, "«Ω", HUI, PINK);break;
-             case 1:LCD_P16X16Str(j_axle,i_axle, "«Ω", BLUE, PINK);break;
-             case 3:LCD_P16X16Str(j_axle,i_axle, "≤°", RED, PINK);break;
-             case 4:LCD_P16X16Str(j_axle,i_axle, "ƒ“", CYAN, PINK);break;
-             case 5:LCD_P16X16Str(j_axle,i_axle, "»À", WHITE, PINK);break;
-             case 7:LCD_P16X16Str(j_axle,i_axle, "ƒ“", GREEN, PINK);break;
-             case 8:LCD_P16X16Str(j_axle,i_axle, "»À", WHITE, PINK);break;
-             #endif
+
+             case 1:LCD_P16X16Str(j_axle,i_axle, "Â¢ô", BLUE, PINK);break;
+             case 3:LCD_P16X16Str(j_axle,i_axle, "ÁóÖ", RED, PINK);break;
+             case 4:LCD_P16X16Str(j_axle,i_axle, "Âõä", CYAN, PINK);break;
+             case 5:LCD_P16X16Str(j_axle,i_axle, "‰∫∫", WHITE, PINK);break;
+             case 7:LCD_P16X16Str(j_axle,i_axle, "Âõä", GREEN, PINK);break;
+             case 8:LCD_P16X16Str(j_axle,i_axle, "‰∫∫", WHITE, PINK);break;
+
              }
          }
      }
  };
-void FreezeScreen()
-{for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
-  { for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
-      {
-          switch(mymap[i_axle][j_axle])
-          {
-            #ifdef   OLED_GAME
-//            case 0:LCD_P16X16Str(j_axle,i_axle, "«Ω", HUI, PINK);break;
-            case 1:LCD_P16X16Str(j_axle,i_axle, "«Ω", BLUE, PINK);break;
-            case 3:LCD_P16X16Str(j_axle,i_axle, "≤°", CYAN, PINK);break;
-            case 4:LCD_P16X16Str(j_axle,i_axle, "ƒ“", CYAN, PINK);break;
-            case 5:LCD_P16X16Str(j_axle,i_axle, "»À", WHITE, PINK);break;
-            case 7:LCD_P16X16Str(j_axle,i_axle, "ƒ“", GREEN, PINK);break;
-            case 8:LCD_P16X16Str(j_axle,i_axle, "»À", WHITE, PINK);break;
-            #endif
-            }
-        }
-    }
-}
-
-void ClsCell(i_axle_rm,j_axle_rm)
+void ClsCell(i_axle_rm,j_axle_rm)//ÊäπÈô§‰∏Ä‰∏™ÂçïÂÖÉÊ†º
 {
         switch(mymap[i_axle_rm][j_axle_rm])
     {
-      #ifdef   OLED_GAME
-//        case 0:LCD_P16X16Str(j_axle,i_axle, "«Ω", HUI, PINK);break;
-        case 1:LCD_P16X16Str(j_axle_rm,i_axle_rm, "«Ω", PINK, PINK);break;
-        case 3:LCD_P16X16Str(j_axle_rm,i_axle_rm, "≤°", PINK, PINK);break;
-        case 4:LCD_P16X16Str(j_axle_rm,i_axle_rm, "ƒ“", PINK, PINK);break;
-        case 5:LCD_P16X16Str(j_axle_rm,i_axle_rm, "»À",PINK, PINK);break;
-        case 7:LCD_P16X16Str(j_axle_rm,i_axle_rm, "ƒ“", PINK, PINK);break;
-        case 8:LCD_P16X16Str(j_axle_rm,i_axle_rm, "»À", PINK, PINK);break;
-      #endif
+
+
+        case 1:LCD_P16X16Str(j_axle_rm,i_axle_rm, "Â¢ô", PINK, PINK);break;
+        case 3:LCD_P16X16Str(j_axle_rm,i_axle_rm, "ÁóÖ", PINK, PINK);break;
+        case 4:LCD_P16X16Str(j_axle_rm,i_axle_rm, "Âõä", PINK, PINK);break;
+        case 5:LCD_P16X16Str(j_axle_rm,i_axle_rm, "‰∫∫",PINK, PINK);break;
+        case 7:LCD_P16X16Str(j_axle_rm,i_axle_rm, "Âõä", PINK, PINK);break;
+        case 8:LCD_P16X16Str(j_axle_rm,i_axle_rm, "‰∫∫", PINK, PINK);break;
+
       }
 }
-void PrfCell(i_axle_Pf,j_axle_Pf)
+void PrfCell(i_axle_Pf,j_axle_Pf)//ÁªòÂà∂‰∏Ä‰∏™ÂçïÂÖÉÊ†º
 {
         switch(mymap[i_axle_Pf][j_axle_Pf])
     {
-      #ifdef   OLED_GAME
-        case 1:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "«Ω", BLUE, PINK);break;
-        case 3:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "≤°", RED, PINK);break;
-        case 4:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "ƒ“", CYAN, PINK);break;
-        case 5:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "»À", WHITE, PINK);break;
-        case 7:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "ƒ“", GREEN, PINK);break;
-        case 8:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "»À", WHITE, PINK);break;
-      #endif
+
+        case 1:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "Â¢ô", BLUE, PINK);break;
+        case 3:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "ÁóÖ", RED, PINK);break;
+        case 4:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "Âõä", CYAN, PINK);break;
+        case 5:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "‰∫∫", WHITE, PINK);break;
+        case 7:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "Âõä", GREEN, PINK);break;
+        case 8:LCD_P16X16Str(j_axle_Pf,i_axle_Pf, "‰∫∫", WHITE, PINK);break;
+
       }
 }
-void Guidance()
+void Guidance()//Ê∏∏ÊàèËØ¥ÊòéÂáΩÊï∞
 {
     LCD_CLS();
-//    LCD_P6X8Str(1, 0, "Press s2 to freeze ", CYAN, BLACK);//œ‘ æ”¢Œƒ6*8◊÷∑˚¥Æ
-//    LCD_P6X8Str(1, 1, "full screen", CYAN, BLACK);//œ‘ æ”¢Œƒ6*8◊÷∑˚¥Æ
-    LCD_P16X16Str(2,0, "”“≤‡Ω¯∂»Ãıº”", CYAN, SLIVER);
-    LCD_P16X16Str(0,1, "‘ÿÕÍ ±£¨”Œœ∑Ω· ¯", CYAN, SLIVER);
-    LCD_P16X16Str(2,2, "¡¡∂»∏ﬂµƒª∑æ≥", CYAN, SLIVER);
-    LCD_P16X16Str(0,3, "Ω´ƒ—“‘ÕÍ≥…ÃÙ’Ω", CYAN, SLIVER);
-
-//    LCD_P16X16Str(3,1, "∫‹“≈∫∂", RED, SLIVER);
-//    LCD_P16X16Str(3,1, "∫‹“≈∫∂", RED, SLIVER);
-
+    LCD_P16X16Str(2,0, "Âè≥‰æßËøõÂ∫¶Êù°Âä†", CYAN, SLIVER);
+    LCD_P16X16Str(0,1, "ËΩΩÂÆåÊó∂ÔºåÊ∏∏ÊàèÁªìÊùü", CYAN, SLIVER);
+    LCD_P16X16Str(2,2, "‰∫ÆÂ∫¶È´òÁöÑÁéØÂ¢É", CYAN, SLIVER);
+    LCD_P16X16Str(0,3, "Â∞ÜÈöæ‰ª•ÂÆåÊàêÊåëÊàò", CYAN, SLIVER);
 }
-void play1()
+void play1()//ÂÖ≥Âç°‰∫å
 {
     loop:
-//    Guidance();//”Œœ∑Àµ√˜ È
     delay(1000);
-    BarY=64;//≥ı ºªØΩ¯∂»Ãı
+    BarY=64;//ÂàùÂßãÂåñËøõÂ∫¶Êù°
     //change map
     int mymap_new[MAPX_MAX][MAPY_MAX]=
     {
-     {1,0,0,3,0,1,1},       //0 blank
-     {1,0,4,5,0,1,1},       // 1 wall
-     {1,3,1,4,0,1,1},       // 3 virus
-     {1,0,4,0,3,1,1},       //4vaccine
-      };
-        for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
-            {for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
-                {
-                    mymap[i_axle][j_axle]= mymap_new[i_axle][j_axle];
-                }
-              }
+     {1,0,0,3,0,1,1},     
+     {1,0,4,5,0,1,1},    
+     {1,3,1,4,0,1,1},       
+     {1,0,4,0,3,1,1},       
+    };
+    for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
+        {
+          for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
+            {
+                mymap[i_axle][j_axle]= mymap_new[i_axle][j_axle];
+            }
+        }
     //change map
-//    LCD_CLS();
     LCD_display_full(PINK);
     paint();
-    PersonX=1;
-    PersonY=3;//≥ı ºŒª÷√
+    PersonX=1;//ÂàùÂßãÂåñÂåªÊä§‰∫∫ÂëòÂàùÂßã‰ΩçÁΩÆ
+    PersonY=3;
     GameState=1;
         while(mymap[2][1]!=7||mymap[0][3]!=7||mymap[3][4]!=7)
         {
@@ -208,11 +175,12 @@ void play1()
             }
             delay(500);
             Progress_Bar();
-            returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//Õ”¬›“«
-            MAP_ADC14_toggleConversionTrigger();//øÿ÷∆–°»À“∆∂ØÀŸ∂»
+            returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//Ëé∑ÂèñÂä†ÈÄüÂ∫¶‰º†ÊÑüÂô®Êï∞ÂÄº
+            MAP_ADC14_toggleConversionTrigger();//‰∏ªÂä®ÂºÄÂêØADC
+            //Êï∞Ê®°ËΩ¨Êç¢Ëé∑ÂèñÊëáÊùÜÁä∂ÊÄÅ
             curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
             curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
-            if(curADCResultX>15000)
+            if(curADCResultX>15000)//Âè≥
               {
                 if(mymap[PersonX][PersonY+1]==0||mymap[PersonX][PersonY+1]==3)
                   {
@@ -224,7 +192,7 @@ void play1()
                     PrfCell(PersonX,PersonY+1);
                     PersonY++;
                     }
-             else if((mymap[PersonX][PersonY+1]==4||mymap[PersonX][PersonY+1]==7)&&(mymap[PersonX][PersonY+2]==0||mymap[PersonX][PersonY+2]==3))
+                else if((mymap[PersonX][PersonY+1]==4||mymap[PersonX][PersonY+1]==7)&&(mymap[PersonX][PersonY+2]==0||mymap[PersonX][PersonY+2]==3))
                        {
                      ClsCell(PersonX,PersonY);
                      ClsCell(PersonX,PersonY+1);
@@ -238,14 +206,13 @@ void play1()
                        PersonY++;
 
                        }
-//                paint();
                 }
-             else if(curADCResultX<1000)
+            else if(curADCResultX<1000)//Â∑¶
              {
-if(PersonY!=0)
+                if(PersonY!=0)
                 {
 
-                    if(mymap[PersonX][PersonY-1]==0||mymap[PersonX][PersonY-1]==3)
+                  if(mymap[PersonX][PersonY-1]==0||mymap[PersonX][PersonY-1]==3)
                   {
                     ClsCell(PersonX,PersonY);
                     ClsCell(PersonX,PersonY-1);
@@ -255,11 +222,11 @@ if(PersonY!=0)
                     PrfCell(PersonX,PersonY-1);
                     PersonY--;
                     }
-                else if((mymap[PersonX][PersonY-1]==4||mymap[PersonX][PersonY-1]==7)&&(mymap[PersonX][PersonY-2]==0||mymap[PersonX][PersonY-2]==3))
-                       {
-                    ClsCell(PersonX,PersonY);
-                    ClsCell(PersonX,PersonY-1);
-                    ClsCell(PersonX,PersonY-2);
+                  else if((mymap[PersonX][PersonY-1]==4||mymap[PersonX][PersonY-1]==7)&&(mymap[PersonX][PersonY-2]==0||mymap[PersonX][PersonY-2]==3))
+                    {
+                      ClsCell(PersonX,PersonY);
+                      ClsCell(PersonX,PersonY-1);
+                      ClsCell(PersonX,PersonY-2);
                       mymap[PersonX][PersonY]-=5;
                       mymap[PersonX][PersonY-1]+=1;
                       mymap[PersonX][PersonY-2]+=4;
@@ -267,57 +234,54 @@ if(PersonY!=0)
                       PrfCell(PersonX,PersonY-1);
                       PrfCell(PersonX,PersonY-2);
                       PersonY--;
-                     }
+                    }
                 }
              }
-//                    paint();
-
-            else if(curADCResultY>15000)
+            else if(curADCResultY>15000)//‰∏ã
             {
                 if(mymap[PersonX+1][PersonY]==0||mymap[PersonX+1][PersonY]==3)
                   {
                     ClsCell(PersonX,PersonY);
                     ClsCell(PersonX+1,PersonY);
                     mymap[PersonX][PersonY]-=5;
-                  mymap[PersonX+1][PersonY]+=5;
-                  PrfCell(PersonX,PersonY);
-                  PrfCell(PersonX+1,PersonY);
+                    mymap[PersonX+1][PersonY]+=5;
+                    PrfCell(PersonX,PersonY);
+                    PrfCell(PersonX+1,PersonY);
                     PersonX++;
-                    }
-                     else if((mymap[PersonX+1][PersonY]==4||mymap[PersonX+1][PersonY]==7)&&(mymap[PersonX+2][PersonY]==0||mymap[PersonX+2][PersonY]==3))
-                       {
-                         ClsCell(PersonX,PersonY);
-                         ClsCell(PersonX+1,PersonY);
-                         ClsCell(PersonX+2,PersonY);
-                      mymap[PersonX][PersonY]-=5;
-                      mymap[PersonX+1][PersonY]+=1;
-                      mymap[PersonX+2][PersonY]+=4;
-                      PrfCell(PersonX,PersonY);
-                      PrfCell(PersonX+1,PersonY);
-                      PrfCell(PersonX+2,PersonY);
-                       PersonX++;
-                       }
-//                paint();
-              }
-          else if (curADCResultY<1000)
+                  }
+                else if((mymap[PersonX+1][PersonY]==4||mymap[PersonX+1][PersonY]==7)&&(mymap[PersonX+2][PersonY]==0||mymap[PersonX+2][PersonY]==3))
+                  {
+                    ClsCell(PersonX,PersonY);
+                    ClsCell(PersonX+1,PersonY);
+                    ClsCell(PersonX+2,PersonY);
+                    mymap[PersonX][PersonY]-=5;
+                    mymap[PersonX+1][PersonY]+=1;
+                    mymap[PersonX+2][PersonY]+=4;
+                    PrfCell(PersonX,PersonY);
+                    PrfCell(PersonX+1,PersonY);
+                    PrfCell(PersonX+2,PersonY);
+                    PersonX++;
+                  }
+            }
+          else if (curADCResultY<1000)//‰∏ä
             {
               if(PersonX==2||PersonX==3||(PersonX==1&&(mymap[0][PersonY]==0||mymap[0][PersonY]==3)))
               {
-               if(mymap[PersonX-1][PersonY]==0||mymap[PersonX-1][PersonY]==3)
+                if(mymap[PersonX-1][PersonY]==0||mymap[PersonX-1][PersonY]==3)
                   {
-                   ClsCell(PersonX,PersonY);
-                   ClsCell(PersonX-1,PersonY);
+                    ClsCell(PersonX,PersonY);
+                    ClsCell(PersonX-1,PersonY);
                     mymap[PersonX][PersonY]-=5;
                     mymap[PersonX-1][PersonY]+=5;
                     PrfCell(PersonX,PersonY);
                     PrfCell(PersonX-1,PersonY);
                     PersonX--;
-                    }
-               else if((mymap[PersonX-1][PersonY]==4||mymap[PersonX-1][PersonY]==7)&&(mymap[PersonX-2][PersonY]==0||mymap[PersonX-2][PersonY]==3))
+                  }
+                else if((mymap[PersonX-1][PersonY]==4||mymap[PersonX-1][PersonY]==7)&&(mymap[PersonX-2][PersonY]==0||mymap[PersonX-2][PersonY]==3))
                    {
-                   ClsCell(PersonX,PersonY);
-                   ClsCell(PersonX-1,PersonY);
-                   ClsCell(PersonX-2,PersonY);
+                     ClsCell(PersonX,PersonY);
+                     ClsCell(PersonX-1,PersonY);
+                     ClsCell(PersonX-2,PersonY);
                      mymap[PersonX][PersonY]-=5;
                      mymap[PersonX-1][PersonY]+=1;
                      mymap[PersonX-2][PersonY]+=4;
@@ -325,22 +289,20 @@ if(PersonY!=0)
                      PrfCell(PersonX-1,PersonY);
                      PrfCell(PersonX-2,PersonY);
                      PersonX--;
-                    }
-//               paint();
+                  }
               }
-              }
+            }
           else if(s_accelXYZ.z<-15000)
           {
              goto loop;
           }
         }
 }
-void play2()
+void play2()//ÂÖ≥Âç°‰∏â
 {
     loop:
-//    Guidance();//”Œœ∑Àµ√˜ È
     delay(1000);
-    BarY=64;//≥ı ºªØΩ¯∂»Ãı
+    BarY=64;
     //change map
     int mymap_new[MAPX_MAX][MAPY_MAX]=
     {
@@ -360,7 +322,7 @@ void play2()
     LCD_display_full(PINK);
     paint();
     PersonX=3;
-    PersonY=5;//≥ı ºŒª÷√
+    PersonY=5;//ÔøΩÔøΩ ºŒªÔøΩÔøΩ
     GameState=1;
         while(mymap[0][0]!=7||mymap[1][0]!=7||mymap[2][0]!=7||mymap[2][1]!=7||mymap[3][1]!=7)
         {
@@ -369,13 +331,13 @@ void play2()
                 GameState=0;
                 break;
             }
-            delay(500);
             Progress_Bar();
-            returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//Õ”¬›“«
-            MAP_ADC14_toggleConversionTrigger();//øÿ÷∆–°»À“∆∂ØÀŸ∂»
+            returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//Ëé∑ÂèñÂä†ÈÄüÂ∫¶‰º†ÊÑüÂô®Êï∞ÂÄº
+            MAP_ADC14_toggleConversionTrigger();//‰∏ªÂä®ÂºÄÂêØADC
+            //Êï∞Ê®°ËΩ¨Êç¢Ëé∑ÂèñÊëáÊùÜÁä∂ÊÄÅ
             curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
             curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
-            if(curADCResultX>15000)
+            if(curADCResultX>15000)//Âè≥
               {
                 if(mymap[PersonX][PersonY+1]==0||mymap[PersonX][PersonY+1]==3)
                   {
@@ -387,7 +349,7 @@ void play2()
                     PrfCell(PersonX,PersonY+1);
                     PersonY++;
                     }
-             else if((mymap[PersonX][PersonY+1]==4||mymap[PersonX][PersonY+1]==7)&&(mymap[PersonX][PersonY+2]==0||mymap[PersonX][PersonY+2]==3))
+                else if((mymap[PersonX][PersonY+1]==4||mymap[PersonX][PersonY+1]==7)&&(mymap[PersonX][PersonY+2]==0||mymap[PersonX][PersonY+2]==3))
                        {
                      ClsCell(PersonX,PersonY);
                      ClsCell(PersonX,PersonY+1);
@@ -401,14 +363,13 @@ void play2()
                        PersonY++;
 
                        }
-//                paint();
                 }
-             else if(curADCResultX<1000)
+            else if(curADCResultX<1000)//Â∑¶
              {
-if(PersonY!=0)
+                if(PersonY!=0)
                 {
 
-                    if(mymap[PersonX][PersonY-1]==0||mymap[PersonX][PersonY-1]==3)
+                  if(mymap[PersonX][PersonY-1]==0||mymap[PersonX][PersonY-1]==3)
                   {
                     ClsCell(PersonX,PersonY);
                     ClsCell(PersonX,PersonY-1);
@@ -418,11 +379,11 @@ if(PersonY!=0)
                     PrfCell(PersonX,PersonY-1);
                     PersonY--;
                     }
-                else if((mymap[PersonX][PersonY-1]==4||mymap[PersonX][PersonY-1]==7)&&(mymap[PersonX][PersonY-2]==0||mymap[PersonX][PersonY-2]==3))
-                       {
-                    ClsCell(PersonX,PersonY);
-                    ClsCell(PersonX,PersonY-1);
-                    ClsCell(PersonX,PersonY-2);
+                  else if((mymap[PersonX][PersonY-1]==4||mymap[PersonX][PersonY-1]==7)&&(mymap[PersonX][PersonY-2]==0||mymap[PersonX][PersonY-2]==3))
+                    {
+                      ClsCell(PersonX,PersonY);
+                      ClsCell(PersonX,PersonY-1);
+                      ClsCell(PersonX,PersonY-2);
                       mymap[PersonX][PersonY]-=5;
                       mymap[PersonX][PersonY-1]+=1;
                       mymap[PersonX][PersonY-2]+=4;
@@ -430,11 +391,9 @@ if(PersonY!=0)
                       PrfCell(PersonX,PersonY-1);
                       PrfCell(PersonX,PersonY-2);
                       PersonY--;
-                     }
+                    }
                 }
              }
-//                    paint();
-
             else if(curADCResultY>15000)
             {
                 if(mymap[PersonX+1][PersonY]==0||mymap[PersonX+1][PersonY]==3)
@@ -442,45 +401,44 @@ if(PersonY!=0)
                     ClsCell(PersonX,PersonY);
                     ClsCell(PersonX+1,PersonY);
                     mymap[PersonX][PersonY]-=5;
-                  mymap[PersonX+1][PersonY]+=5;
-                  PrfCell(PersonX,PersonY);
-                  PrfCell(PersonX+1,PersonY);
+                    mymap[PersonX+1][PersonY]+=5;
+                    PrfCell(PersonX,PersonY);
+                    PrfCell(PersonX+1,PersonY);
                     PersonX++;
-                    }
-                     else if((mymap[PersonX+1][PersonY]==4||mymap[PersonX+1][PersonY]==7)&&(mymap[PersonX+2][PersonY]==0||mymap[PersonX+2][PersonY]==3))
-                       {
-                         ClsCell(PersonX,PersonY);
-                         ClsCell(PersonX+1,PersonY);
-                         ClsCell(PersonX+2,PersonY);
-                      mymap[PersonX][PersonY]-=5;
-                      mymap[PersonX+1][PersonY]+=1;
-                      mymap[PersonX+2][PersonY]+=4;
-                      PrfCell(PersonX,PersonY);
-                      PrfCell(PersonX+1,PersonY);
-                      PrfCell(PersonX+2,PersonY);
-                       PersonX++;
-                       }
-//                paint();
-              }
+                  }
+                else if((mymap[PersonX+1][PersonY]==4||mymap[PersonX+1][PersonY]==7)&&(mymap[PersonX+2][PersonY]==0||mymap[PersonX+2][PersonY]==3))
+                  {
+                    ClsCell(PersonX,PersonY);
+                    ClsCell(PersonX+1,PersonY);
+                    ClsCell(PersonX+2,PersonY);
+                    mymap[PersonX][PersonY]-=5;
+                    mymap[PersonX+1][PersonY]+=1;
+                    mymap[PersonX+2][PersonY]+=4;
+                    PrfCell(PersonX,PersonY);
+                    PrfCell(PersonX+1,PersonY);
+                    PrfCell(PersonX+2,PersonY);
+                    PersonX++;
+                  }
+            }
           else if (curADCResultY<1000)
             {
               if(PersonX==2||PersonX==3||(PersonX==1&&(mymap[0][PersonY]==0||mymap[0][PersonY]==3)))
               {
-               if(mymap[PersonX-1][PersonY]==0||mymap[PersonX-1][PersonY]==3)
+                if(mymap[PersonX-1][PersonY]==0||mymap[PersonX-1][PersonY]==3)
                   {
-                   ClsCell(PersonX,PersonY);
-                   ClsCell(PersonX-1,PersonY);
+                    ClsCell(PersonX,PersonY);
+                    ClsCell(PersonX-1,PersonY);
                     mymap[PersonX][PersonY]-=5;
                     mymap[PersonX-1][PersonY]+=5;
                     PrfCell(PersonX,PersonY);
                     PrfCell(PersonX-1,PersonY);
                     PersonX--;
-                    }
-               else if((mymap[PersonX-1][PersonY]==4||mymap[PersonX-1][PersonY]==7)&&(mymap[PersonX-2][PersonY]==0||mymap[PersonX-2][PersonY]==3))
+                  }
+                else if((mymap[PersonX-1][PersonY]==4||mymap[PersonX-1][PersonY]==7)&&(mymap[PersonX-2][PersonY]==0||mymap[PersonX-2][PersonY]==3))
                    {
-                   ClsCell(PersonX,PersonY);
-                   ClsCell(PersonX-1,PersonY);
-                   ClsCell(PersonX-2,PersonY);
+                     ClsCell(PersonX,PersonY);
+                     ClsCell(PersonX-1,PersonY);
+                     ClsCell(PersonX-2,PersonY);
                      mymap[PersonX][PersonY]-=5;
                      mymap[PersonX-1][PersonY]+=1;
                      mymap[PersonX-2][PersonY]+=4;
@@ -488,42 +446,41 @@ if(PersonY!=0)
                      PrfCell(PersonX-1,PersonY);
                      PrfCell(PersonX-2,PersonY);
                      PersonX--;
-                    }
-//               paint();
+                  }
               }
-              }
+            }
           else if(s_accelXYZ.z<-15000)
           {
              goto loop;
           }
         }
 }
-void play()
+void play()//ÂÖ≥Âç°‰∏Ä
 {
-    Guidance();//”Œœ∑Àµ√˜ È
+    Guidance();//Ê∏∏ÊàèËØ¥Êòé
 loop:
-    BarY=64;//≥ı ºªØΩ¯∂»Ãı
+    BarY=64;//ÂàùÂßãÂåñËøõÂ∫¶Êù°
     delay(1000);
-//    LCD_CLS();
     //change map
     int mymap_new[MAPX_MAX][MAPY_MAX]=
     {
-     {0,1,0,0,0,1,1},//5 person
-     {1,1,0,3,0,1,1},//7virus+vaccine
-     {1,0,4,4,1,1,1},//8person+vaccine
-     {1,0,0,5,3,1,1},       //4vaccine
-      };
+     {0,1,0,0,0,1,1},
+     {1,1,0,3,0,1,1},
+     {1,0,4,4,1,1,1},
+     {1,0,0,5,3,1,1},    
+    };
         for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
             {for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
                 {
                     mymap[i_axle][j_axle]= mymap_new[i_axle][j_axle];
                 }
               }
-    //change map10
+    //change map
     LCD_display_full(PINK);
     paint();
+    //ÂàùÂßãÂåñÂåªÊä§‰∫∫Âëò‰ΩçÁΩÆ
     PersonX=3;
-    PersonY=3;//≥ı ºŒª÷√
+    PersonY=3;
     GameState=1;
         while(mymap[1][3]!=7||mymap[3][4]!=7)
         {
@@ -534,11 +491,13 @@ loop:
             }
             delay(500);
             Progress_Bar();
-            returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//Õ”¬›“«
-            MAP_ADC14_toggleConversionTrigger();//
+            Progress_Bar();
+            returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//Ëé∑ÂèñÂä†ÈÄüÂ∫¶‰º†ÊÑüÂô®Êï∞ÂÄº
+            MAP_ADC14_toggleConversionTrigger();//‰∏ªÂä®ÂºÄÂêØADC
+            //Êï∞Ê®°ËΩ¨Êç¢Ëé∑ÂèñÊëáÊùÜÁä∂ÊÄÅ
             curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
             curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
-            if(curADCResultX>15000)//right||s_accelXYZ.x<1
+            if(curADCResultX>15000)//Âè≥
               {
                 if(mymap[PersonX][PersonY+1]==0||mymap[PersonX][PersonY+1]==3)
                   {
@@ -550,7 +509,7 @@ loop:
                     PrfCell(PersonX,PersonY+1);
                     PersonY++;
                     }
-             else if((mymap[PersonX][PersonY+1]==4||mymap[PersonX][PersonY+1]==7)&&(mymap[PersonX][PersonY+2]==0||mymap[PersonX][PersonY+2]==3))
+                else if((mymap[PersonX][PersonY+1]==4||mymap[PersonX][PersonY+1]==7)&&(mymap[PersonX][PersonY+2]==0||mymap[PersonX][PersonY+2]==3))
                        {
                      ClsCell(PersonX,PersonY);
                      ClsCell(PersonX,PersonY+1);
@@ -564,14 +523,13 @@ loop:
                        PersonY++;
 
                        }
-//                paint();
                 }
-             else if(curADCResultX<1000)//left||s_accelXYZ.x>10000
+            else if(curADCResultX<1000)//Â∑¶
              {
-                 if(PersonY!=0)
+                if(PersonY!=0)
                 {
 
-                    if(mymap[PersonX][PersonY-1]==0||mymap[PersonX][PersonY-1]==3)
+                  if(mymap[PersonX][PersonY-1]==0||mymap[PersonX][PersonY-1]==3)
                   {
                     ClsCell(PersonX,PersonY);
                     ClsCell(PersonX,PersonY-1);
@@ -581,11 +539,11 @@ loop:
                     PrfCell(PersonX,PersonY-1);
                     PersonY--;
                     }
-                else if((mymap[PersonX][PersonY-1]==4||mymap[PersonX][PersonY-1]==7)&&(mymap[PersonX][PersonY-2]==0||mymap[PersonX][PersonY-2]==3))
-                       {
-                    ClsCell(PersonX,PersonY);
-                    ClsCell(PersonX,PersonY-1);
-                    ClsCell(PersonX,PersonY-2);
+                  else if((mymap[PersonX][PersonY-1]==4||mymap[PersonX][PersonY-1]==7)&&(mymap[PersonX][PersonY-2]==0||mymap[PersonX][PersonY-2]==3))
+                    {
+                      ClsCell(PersonX,PersonY);
+                      ClsCell(PersonX,PersonY-1);
+                      ClsCell(PersonX,PersonY-2);
                       mymap[PersonX][PersonY]-=5;
                       mymap[PersonX][PersonY-1]+=1;
                       mymap[PersonX][PersonY-2]+=4;
@@ -593,57 +551,54 @@ loop:
                       PrfCell(PersonX,PersonY-1);
                       PrfCell(PersonX,PersonY-2);
                       PersonY--;
-                     }
+                    }
                 }
              }
-//                    paint();
-
-            else if(curADCResultY>15000)//down||s_accelXYZ.y>6000
+            else if(curADCResultY>15000)//‰∏ã
             {
                 if(mymap[PersonX+1][PersonY]==0||mymap[PersonX+1][PersonY]==3)
                   {
                     ClsCell(PersonX,PersonY);
                     ClsCell(PersonX+1,PersonY);
                     mymap[PersonX][PersonY]-=5;
-                  mymap[PersonX+1][PersonY]+=5;
-                  PrfCell(PersonX,PersonY);
-                  PrfCell(PersonX+1,PersonY);
+                    mymap[PersonX+1][PersonY]+=5;
+                    PrfCell(PersonX,PersonY);
+                    PrfCell(PersonX+1,PersonY);
                     PersonX++;
-                    }
-                     else if((mymap[PersonX+1][PersonY]==4||mymap[PersonX+1][PersonY]==7)&&(mymap[PersonX+2][PersonY]==0||mymap[PersonX+2][PersonY]==3))
-                       {
-                         ClsCell(PersonX,PersonY);
-                         ClsCell(PersonX+1,PersonY);
-                         ClsCell(PersonX+2,PersonY);
-                      mymap[PersonX][PersonY]-=5;
-                      mymap[PersonX+1][PersonY]+=1;
-                      mymap[PersonX+2][PersonY]+=4;
-                      PrfCell(PersonX,PersonY);
-                      PrfCell(PersonX+1,PersonY);
-                      PrfCell(PersonX+2,PersonY);
-                       PersonX++;
-                       }
-//                paint();
-              }
-          else if (curADCResultY<1000)//up||s_accelXYZ.y<-6000
+                  }
+                else if((mymap[PersonX+1][PersonY]==4||mymap[PersonX+1][PersonY]==7)&&(mymap[PersonX+2][PersonY]==0||mymap[PersonX+2][PersonY]==3))
+                  {
+                    ClsCell(PersonX,PersonY);
+                    ClsCell(PersonX+1,PersonY);
+                    ClsCell(PersonX+2,PersonY);
+                    mymap[PersonX][PersonY]-=5;
+                    mymap[PersonX+1][PersonY]+=1;
+                    mymap[PersonX+2][PersonY]+=4;
+                    PrfCell(PersonX,PersonY);
+                    PrfCell(PersonX+1,PersonY);
+                    PrfCell(PersonX+2,PersonY);
+                    PersonX++;
+                  }
+            }
+          else if (curADCResultY<1000)//‰∏ä
             {
               if(PersonX==2||PersonX==3||(PersonX==1&&(mymap[0][PersonY]==0||mymap[0][PersonY]==3)))
               {
-               if(mymap[PersonX-1][PersonY]==0||mymap[PersonX-1][PersonY]==3)
+                if(mymap[PersonX-1][PersonY]==0||mymap[PersonX-1][PersonY]==3)
                   {
-                   ClsCell(PersonX,PersonY);
-                   ClsCell(PersonX-1,PersonY);
+                    ClsCell(PersonX,PersonY);
+                    ClsCell(PersonX-1,PersonY);
                     mymap[PersonX][PersonY]-=5;
                     mymap[PersonX-1][PersonY]+=5;
                     PrfCell(PersonX,PersonY);
                     PrfCell(PersonX-1,PersonY);
                     PersonX--;
-                    }
-               else if((mymap[PersonX-1][PersonY]==4||mymap[PersonX-1][PersonY]==7)&&(mymap[PersonX-2][PersonY]==0||mymap[PersonX-2][PersonY]==3))
+                  }
+                else if((mymap[PersonX-1][PersonY]==4||mymap[PersonX-1][PersonY]==7)&&(mymap[PersonX-2][PersonY]==0||mymap[PersonX-2][PersonY]==3))
                    {
-                   ClsCell(PersonX,PersonY);
-                   ClsCell(PersonX-1,PersonY);
-                   ClsCell(PersonX-2,PersonY);
+                     ClsCell(PersonX,PersonY);
+                     ClsCell(PersonX-1,PersonY);
+                     ClsCell(PersonX-2,PersonY);
                      mymap[PersonX][PersonY]-=5;
                      mymap[PersonX-1][PersonY]+=1;
                      mymap[PersonX-2][PersonY]+=4;
@@ -651,20 +606,92 @@ loop:
                      PrfCell(PersonX-1,PersonY);
                      PrfCell(PersonX-2,PersonY);
                      PersonX--;
-                    }
-//               paint();
                   }
               }
+            }
           else if(s_accelXYZ.z<-15000)
           {
-            goto loop;
+             goto loop;
           }
-
         }
 }
+void StickAccel()
+{
+    LCD_draw_dot(stick_x,stick_y,RED);
+    LCD_draw_dot(stick_x,stick_y+1,RED);
+    LCD_draw_dot(stick_x,stick_y-1,RED);
+    LCD_draw_dot(stick_x+1,stick_y,RED);
+    LCD_draw_dot(stick_x-1,stick_y,RED);
+    while(1)
+    {
+           delay(200);
+           returnValue = bmi160_read_accel_xyz(&s_accelXYZ);
+           snprintf(test.txString, 60,"x:\%d,y:\%d,z:\%d\r\n",s_accelXYZ.x, s_accelXYZ.y, s_accelXYZ.z);
+           sendTextPc();
+           sendTextEsp();
+            if(s_accelXYZ.x<-15000)
+              {
+                    stick_x++;
+                    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
+                    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+                    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN1);
+                    LCD_draw_dot(stick_x,stick_y,RED);
+                    LCD_draw_dot(stick_x,stick_y+1,RED);
+                    LCD_draw_dot(stick_x,stick_y-1,RED);
+                    LCD_draw_dot(stick_x+1,stick_y,RED);
+                    LCD_draw_dot(stick_x-1,stick_y,RED);
 
-
-void Stick()
+                }
+             else if(s_accelXYZ.x>5000)
+             {
+                 stick_x--;
+                 MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
+                 MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+                 MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN1);
+                 LCD_draw_dot(stick_x,stick_y,RED);
+                 LCD_draw_dot(stick_x,stick_y+1,RED);
+                 LCD_draw_dot(stick_x,stick_y-1,RED);
+                 LCD_draw_dot(stick_x+1,stick_y,RED);
+                 LCD_draw_dot(stick_x-1,stick_y,RED);
+              }
+            else if(s_accelXYZ.y>15000)
+            {
+                stick_y++;
+                MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
+                MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+                MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN2);
+                LCD_draw_dot(stick_x,stick_y,RED);
+                LCD_draw_dot(stick_x,stick_y+1,RED);
+                LCD_draw_dot(stick_x,stick_y-1,RED);
+                LCD_draw_dot(stick_x+1,stick_y,RED);
+                LCD_draw_dot(stick_x-1,stick_y,RED);
+              }
+          else if (s_accelXYZ.y<0)
+            {
+              stick_y--;
+              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
+              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+              MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN2);
+              LCD_draw_dot(stick_x,stick_y,RED);
+              LCD_draw_dot(stick_x,stick_y+1,RED);
+              LCD_draw_dot(stick_x,stick_y-1,RED);
+              LCD_draw_dot(stick_x+1,stick_y,RED);
+              LCD_draw_dot(stick_x-1,stick_y,RED);
+              }
+          else if(s_accelXYZ.z<0)
+          {
+              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
+              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+              break;
+          }
+          else
+          {
+              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
+              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+          }
+    }
+}
+void Stick()//OLED‰∏éÊëáÊùÜÊµãËØïÂäüËÉΩÂáΩÊï∞ÔºåÊàêÊûú‰∏≠Êú™‰ΩøÁî®
 {
         LCD_draw_dot(stick_x,stick_y,RED);
         LCD_draw_dot(stick_x,stick_y+1,RED);
@@ -675,7 +702,7 @@ void Stick()
     while(1)
     {
             delay(0);
-            MAP_ADC14_toggleConversionTrigger();// ÷∂Øø™∆ÙADC◊™ªª
+            MAP_ADC14_toggleConversionTrigger();
             curADCResultX = MAP_ADC14_getResult(ADC_MEM0);
             curADCResultY= MAP_ADC14_getResult(ADC_MEM1);
             if(curADCResultX>15000)
@@ -738,104 +765,4 @@ void Stick()
 
     }
 };
-void StickAccel()
-{
-        LCD_draw_dot(stick_x,stick_y,RED);
-        LCD_draw_dot(stick_x,stick_y+1,RED);
-        LCD_draw_dot(stick_x,stick_y-1,RED);
-        LCD_draw_dot(stick_x+1,stick_y,RED);
-        LCD_draw_dot(stick_x-1,stick_y,RED);
-            LCD_draw_dot(64,32,RED);
-    while(1)
-    {
-            delay(200);
-            returnValue = bmi160_read_accel_xyz(&s_accelXYZ);//Õ”¬›“«
-           snprintf(test.txString, 60,"x:\%d,y:\%d,z:\%d\r\n",s_accelXYZ.x, s_accelXYZ.y, s_accelXYZ.z);
-           sendTextPc();
-           sendTextEsp();
-            if(s_accelXYZ.x<-15000)
-              {
-                    stick_x++;
-                    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
-                    MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-//                    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-                    MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN1);
-//                    LCD_draw_dot(stick_x-1,stick_y,BLACK);
-//                    LCD_draw_dot(stick_x-1+1,stick_y,BLACK);
-//                    LCD_draw_dot(stick_x-1-1,stick_y,BLACK);
-//                    LCD_draw_dot(stick_x-1,stick_y-1,BLACK);
-//                    LCD_draw_dot(stick_x-1,stick_y+1,BLACK);
-                    LCD_draw_dot(stick_x,stick_y,RED);
-                    LCD_draw_dot(stick_x,stick_y+1,RED);
-                    LCD_draw_dot(stick_x,stick_y-1,RED);
-                    LCD_draw_dot(stick_x+1,stick_y,RED);
-                    LCD_draw_dot(stick_x-1,stick_y,RED);
-
-                }
-             else if(s_accelXYZ.x>5000)
-             {
-                 stick_x--;
-                 MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
-                 MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-//                 MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-                 MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN1);
-//                 LCD_draw_dot(stick_x+1,stick_y,BLACK);
-//                 LCD_draw_dot(stick_x+1,stick_y+1,BLACK);
-//                 LCD_draw_dot(stick_x+1,stick_y-1,BLACK);
-//                 LCD_draw_dot(stick_x+1+1,stick_y,BLACK);
-//                 LCD_draw_dot(stick_x+1-1,stick_y,BLACK);
-                 LCD_draw_dot(stick_x,stick_y,RED);
-                 LCD_draw_dot(stick_x,stick_y+1,RED);
-                 LCD_draw_dot(stick_x,stick_y-1,RED);
-                 LCD_draw_dot(stick_x+1,stick_y,RED);
-                 LCD_draw_dot(stick_x-1,stick_y,RED);
-              }
-            else if(s_accelXYZ.y>15000)
-            {
-                stick_y++;
-                MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
-                MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-                MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN2);
-//                LCD_draw_dot(stick_x,stick_y-1,BLACK);
-//                LCD_draw_dot(stick_x,stick_y-1+1,BLACK);
-//                LCD_draw_dot(stick_x,stick_y-1-1,BLACK);
-//                LCD_draw_dot(stick_x+1,stick_y-1,BLACK);
-//                LCD_draw_dot(stick_x-1,stick_y-1,BLACK);
-                LCD_draw_dot(stick_x,stick_y,RED);
-                LCD_draw_dot(stick_x,stick_y+1,RED);
-                LCD_draw_dot(stick_x,stick_y-1,RED);
-                LCD_draw_dot(stick_x+1,stick_y,RED);
-                LCD_draw_dot(stick_x-1,stick_y,RED);
-              }
-          else if (s_accelXYZ.y<0)
-            {
-              stick_y--;
-              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
-              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-              MAP_GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN2);
-//              LCD_draw_dot(stick_x,stick_y+1,BLACK);
-//              LCD_draw_dot(stick_x,stick_y+1+1,BLACK);
-//              LCD_draw_dot(stick_x,stick_y+1-1,BLACK);
-//              LCD_draw_dot(stick_x+1,stick_y+1,BLACK);
-//              LCD_draw_dot(stick_x-1,stick_y+1,BLACK);
-              LCD_draw_dot(stick_x,stick_y,RED);
-              LCD_draw_dot(stick_x,stick_y+1,RED);
-              LCD_draw_dot(stick_x,stick_y-1,RED);
-              LCD_draw_dot(stick_x+1,stick_y,RED);
-              LCD_draw_dot(stick_x-1,stick_y,RED);
-              }
-          else if(s_accelXYZ.z<0)
-          {
-              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
-              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-              break;
-          }
-          else
-          {
-              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
-              MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-          }
-    }
-}
-
 #endif /* MY_SOURCE_H_ */
