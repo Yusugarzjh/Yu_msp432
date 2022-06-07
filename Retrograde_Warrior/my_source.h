@@ -50,7 +50,7 @@ bool BME_on = true;
 // OPT3001
 uint16_t rawData;
 float     convertedLux;
-#define  MAPX_MAX 4
+#define  MAPX_MAX 5
 #define  MAPY_MAX 7
 bool BMI_on = true;
 int i_axle,j_axle;
@@ -61,7 +61,7 @@ int mymap[MAPX_MAX][MAPY_MAX]=           //定义一个8x8的地图，用数组表示各单元格
   {0,0,0,0,0,0,1},//7virus+vaccine
   {0,0,0,0,0,0,1},//8person+vaccine
   {0,0,0,0,0,0,1},
-
+  {1,1,1,1,1,1,1},
   };
 int PersonX,PersonY,stick_x=68,stick_y=32;
 int BarX=114,BarY=64,GameState=0,TimerInterval=1;//进度条相关
@@ -184,7 +184,8 @@ void play()
      {1,0,0,3,0,1,1},       //0 blank
      {1,0,4,5,0,1,1},       // 1 wall
      {1,3,1,4,0,1,1},       // 3 virus
-     {1,0,4,0,3,1,1},       //4vaccine
+     {1,0,4,0,3,1,1},
+     {1,1,1,1,1,1,1},
       };
         for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
             {for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
@@ -348,6 +349,7 @@ void play2()
      {3,1,0,4,4,0,1},       // 1 wall
      {3,3,4,4,0,0,1},       // 3 virus
      {0,3,0,0,4,5,1},       //4vaccine
+     {1,1,1,1,1,1,1},
       };
         for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
             {for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
@@ -512,6 +514,7 @@ loop:
      {1,1,0,3,0,1,1},//7virus+vaccine
      {1,0,4,4,1,1,1},//8person+vaccine
      {1,0,0,5,3,1,1},       //4vaccine
+     {1,1,1,1,1,1,1},
       };
         for( i_axle=0;i_axle<MAPX_MAX;i_axle++)
             {for( j_axle=0;j_axle<MAPY_MAX;j_axle++)
@@ -753,7 +756,7 @@ void StickAccel()
            snprintf(test.txString, 60,"x:\%d,y:\%d,z:\%d\r\n",s_accelXYZ.x, s_accelXYZ.y, s_accelXYZ.z);
            sendTextPc();
            sendTextEsp();
-            if(s_accelXYZ.x<-15000)
+            if(s_accelXYZ.x<-8000)
               {
                     stick_x++;
                     MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
@@ -772,7 +775,7 @@ void StickAccel()
                     LCD_draw_dot(stick_x-1,stick_y,RED);
 
                 }
-             else if(s_accelXYZ.x>5000)
+             else if(s_accelXYZ.x>8000)
              {
                  stick_x--;
                  MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
@@ -790,7 +793,7 @@ void StickAccel()
                  LCD_draw_dot(stick_x+1,stick_y,RED);
                  LCD_draw_dot(stick_x-1,stick_y,RED);
               }
-            else if(s_accelXYZ.y>15000)
+            else if(s_accelXYZ.y>8000)
             {
                 stick_y++;
                 MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);
@@ -807,7 +810,7 @@ void StickAccel()
                 LCD_draw_dot(stick_x+1,stick_y,RED);
                 LCD_draw_dot(stick_x-1,stick_y,RED);
               }
-          else if (s_accelXYZ.y<0)
+          else if (s_accelXYZ.y<-1000)
             {
               stick_y--;
               MAP_GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0 | GPIO_PIN1 | GPIO_PIN2);

@@ -104,8 +104,7 @@ void adcInit(void)//adc模块初始化
 {
     /*引脚连接
       VRX-->5.5
-      VRY-->5.4
-      SW -->6.4*/
+      VRY-->5.4*/
     MAP_REF_A_setReferenceVoltage(REF_A_VREF2_5V);
     MAP_REF_A_enableReferenceVoltage();
     MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);

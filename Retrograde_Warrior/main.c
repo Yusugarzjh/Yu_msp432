@@ -28,22 +28,7 @@ int main(void)
     StickAccel();
     GameMenu();
      while(1){
-//                  sensorOpt3001Read(&rawData);
-//                   sensorOpt3001Convert(rawData, &convertedLux);
-//                   //contrsuct JSON string for OPT
-//                   snprintf(test.txString, 60,
-//                           "{\"light\":{\"lux\":%d}}\r\n",
-//                           abs(convertedLux));
-//                   sendTextPc();
-//                   if(convertedLux<100)
-//                       MAP_UART_transmitData(EUSCI_A0_BASE, 48);
-//                   else if(convertedLux>500)
-//                       MAP_UART_transmitData(EUSCI_A0_BASE, 50);
-//                   else
-//                       MAP_UART_transmitData(EUSCI_A0_BASE, 49);
-
-
-                 ;
+              ;
              }
 }
 void all_init()
@@ -90,8 +75,16 @@ void LevelSelection()
         {
             LCD_P16X16Str(3,1, "恭喜你", ORANGE, SLIVER);
             LCD_P16X16Str(2,2, "成功通过", ORANGE, SLIVER);
-            GameRecord++;
-            ChooseMenu_gaming_win();
+            if(GameRecord==2&&GameState==1)
+            {
+                GameRecord=0;
+                ChooseMenu_master();
+            }
+            else
+            {
+                GameRecord++;
+                ChooseMenu_gaming_win();
+            }
         }
 }
 void ChooseMenu_master()
